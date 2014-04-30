@@ -8,7 +8,7 @@ import (
 
 	"io"
 	"log"
-	//"fmt"
+	"fmt"
 
 	"net/http"
 	"text/template"
@@ -46,6 +46,13 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 }
 
 
+func oauth2error(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Fprint(w, "Auth error")
+}
+
+
+
 
 func init() {
 
@@ -59,9 +66,6 @@ func init() {
 	var client_id string
 	var client_secret string
 	var redirect_url string
-
-
-
 
 
 	if ( appengine.IsDevAppServer() ) {
@@ -83,9 +87,13 @@ func init() {
 		ClientSecret: client_secret,
 		RedirectURL:  redirect_url,
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile"},
+
+
 	}))
 
 
+
+	m.Get("/oauth2error", oauth2error)
 
 
 	m.Get("/", handleMainPage)

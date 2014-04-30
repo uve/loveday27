@@ -1,5 +1,6 @@
 {
-    "OAuthConfig": {
+    session_name: "sid",
+    "oauth2": {
         "ClientId":     "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com",
         "ClientSecret": "TCEAw8gTQBwyOKcYpqH8NTF4",
         "Scope":        "https://www.googleapis.com/auth/userinfo.profile"

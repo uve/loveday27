@@ -30,6 +30,8 @@ import (
 
 	"appengine"
 	"appengine/urlfetch"
+
+	"io/ioutil"
 )
 
 const (
@@ -49,6 +51,20 @@ var (
 	// Path to handle error cases.
 	PathError = "/oauth2error"
 )
+
+
+// This is the URL that Google has defined so that an authenticated application may obtain the user's info in json format.
+const profileInfoURL = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json"
+
+
+type User struct {
+
+	Name  string
+	Link  string
+	Picture string
+	Gender  string
+}
+
 
 // Represents OAuth2 backend options.
 type Options struct {
@@ -217,13 +233,17 @@ func handleOAuth2Callback2(t *oauth.Transport, s sessions.Session, w http.Respon
 	// Store the credentials in the session.
 	val, _ := json.Marshal(tk)
 	s.Set(keyToken, val)
+
+
+
+
 	http.Redirect(w, r, next, codeRedirect)
 }
 
 
 
 // Function that handles the callback from the Google server.
-func handleOAuth2Callback(t2 *oauth.Transport, s sessions.Session, w http.ResponseWriter, r *http.Request) {
+func handleOAuth2Callback(t *oauth.Transport, s sessions.Session, w http.ResponseWriter, r *http.Request) {
 
 	// Initialize an appengine context.
 	c := appengine.NewContext(r)
@@ -234,11 +254,11 @@ func handleOAuth2Callback(t2 *oauth.Transport, s sessions.Session, w http.Respon
 	code := r.FormValue("code")
 
 	// Configure OAuth's http.Client to use the appengine/urlfetch transport that all Google App Engine applications have to use for outbound requests.
-	t := &oauth.Transport{Config: t2.Config, Transport: &urlfetch.Transport{Context: c}}
+	t2 := &oauth.Transport{Config: t.Config, Transport: &urlfetch.Transport{Context: c}}
 
 
 	// Exchange the received code for a token.
-	token, err := t.Exchange(code)
+	token, err := t2.Exchange(code)
 	if err != nil {
 		// Pass the error message, or allow dev to provide its own
 		// error handler.
@@ -256,14 +276,39 @@ func handleOAuth2Callback(t2 *oauth.Transport, s sessions.Session, w http.Respon
 		// Pass the error message, or allow dev to provide its own
 		// error handler.
 
-		c.Errorf("Can't json credentials: %v", err)
+		c.Errorf("Can't parse credentials token: %v", err)
 
 		http.Redirect(w, r, PathError, codeRedirect)
 		return
 	}
 	s.Set(keyToken, val)
 
-	c.Infof("Token: %s", val)
+
+	// Now get user data based on the Transport which has the token.
+	resp, _ := t2.Client().Get(profileInfoURL)
+
+
+	//var someStruct map[string]interface{}
+	var someStruct User
+
+	message, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// Pass the error message, or allow dev to provide its own
+		// error handler.
+
+		c.Errorf("Can't parse credentials: %v", err)
+
+		http.Redirect(w, r, PathError, codeRedirect)
+		return
+	}
+
+	if err := json.Unmarshal([]byte(string(message)), &someStruct); err != nil {
+		panic(err)
+	}
+
+
+	c.Infof("New User: %s", someStruct)
+
 
 	http.Redirect(w, r, next, codeRedirect)
 
