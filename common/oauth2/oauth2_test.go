@@ -23,10 +23,15 @@ import (
 	"common/sessions"
 )
 
+
+var cookie_name   = core.GetConfig().CookieName
+var cookie_secret = core.GetConfig().CookieSecret
+
+
 func Test_LoginRedirect(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	m := martini.New()
-	m.Use(sessions.Sessions("my_session", sessions.NewCookieStore([]byte("secret123"))))
+	m.Use(sessions.Sessions(cookie_name, sessions.NewCookieStore([]byte(cookie_secret))))
 	m.Use(Google(&Options{
 		ClientId:     "client_id",
 		ClientSecret: "client_secret",
@@ -49,7 +54,7 @@ func Test_LoginRedirect(t *testing.T) {
 func Test_LoginRedirectAfterLoginRequired(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	m := martini.Classic()
-	m.Use(sessions.Sessions("my_session", sessions.NewCookieStore([]byte("secret123"))))
+	m.Use(sessions.Sessions(cookie_name, sessions.NewCookieStore([]byte(cookie_secret))))
 	m.Use(Google(&Options{
 		ClientId:     "client_id",
 		ClientSecret: "client_secret",
@@ -75,10 +80,10 @@ func Test_LoginRedirectAfterLoginRequired(t *testing.T) {
 
 func Test_Logout(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	s := sessions.NewCookieStore([]byte("secret123"))
+	s := sessions.NewCookieStore([]byte(cookie_secret))
 
 	m := martini.Classic()
-	m.Use(sessions.Sessions("my_session", s))
+	m.Use(sessions.Sessions(cookie_name, s))
 	m.Use(Google(&Options{
 	// no need to configure
 	}))
@@ -106,10 +111,10 @@ func Test_Logout(t *testing.T) {
 
 func Test_LogoutOnAccessTokenExpiration(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	s := sessions.NewCookieStore([]byte("secret123"))
+	s := sessions.NewCookieStore([]byte(cookie_secret))
 
 	m := martini.Classic()
-	m.Use(sessions.Sessions("my_session", s))
+	m.Use(sessions.Sessions(cookie_name, s))
 	m.Use(Google(&Options{
 	// no need to configure
 	}))
@@ -133,7 +138,7 @@ func Test_LogoutOnAccessTokenExpiration(t *testing.T) {
 func Test_InjectedTokens(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	m := martini.Classic()
-	m.Use(sessions.Sessions("my_session", sessions.NewCookieStore([]byte("secret123"))))
+	m.Use(sessions.Sessions(cookie_name, sessions.NewCookieStore([]byte(cookie_secret))))
 	m.Use(Google(&Options{
 	// no need to configure
 	}))
@@ -147,7 +152,7 @@ func Test_InjectedTokens(t *testing.T) {
 func Test_LoginRequired(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	m := martini.Classic()
-	m.Use(sessions.Sessions("my_session", sessions.NewCookieStore([]byte("secret123"))))
+	m.Use(sessions.Sessions(cookie_name, sessions.NewCookieStore([]byte(cookie_secret))))
 	m.Use(Google(&Options{
 	// no need to configure
 	}))

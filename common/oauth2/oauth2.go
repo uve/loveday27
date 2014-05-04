@@ -32,6 +32,9 @@ import (
 	"appengine/urlfetch"
 
 	"io/ioutil"
+	
+	"core/user"
+	
 )
 
 const (
@@ -50,20 +53,14 @@ var (
 	PathCallback = "/oauth2callback"
 	// Path to handle error cases.
 	PathError = "/oauth2error"
+	
+	RedirectUrl = "/"
 )
 
 
 // This is the URL that Google has defined so that an authenticated application may obtain the user's info in json format.
 const profileInfoURL = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json"
 
-
-type User struct {
-
-	Name  string
-	Link  string
-	Picture string
-	Gender  string
-}
 
 
 // Represents OAuth2 backend options.
@@ -75,6 +72,8 @@ type Options struct {
 
 	AuthUrl  string
 	TokenUrl string
+	
+	ProfileUrl string	
 }
 
 // Represents a container that contains
@@ -129,6 +128,18 @@ func (t *token) String() string {
 func Google(opts *Options) martini.Handler {
 	opts.AuthUrl = "https://accounts.google.com/o/oauth2/auth"
 	opts.TokenUrl = "https://accounts.google.com/o/oauth2/token"
+	
+	opts.ProfileUrl = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json"
+	opts.Scopes     = []string{"https://www.googleapis.com/auth/userinfo.profile"}
+	
+	return NewOAuth2Provider(opts)
+}
+
+
+// Returns a new Github OAuth 2.0 backend endpoint.
+func Twitter(opts *Options) martini.Handler {
+	opts.AuthUrl = "https://api.twitter.com/oauth/authorize"
+	opts.TokenUrl = "https://api.twitter.com/oauth/access_token"
 	return NewOAuth2Provider(opts)
 }
 
@@ -192,7 +203,7 @@ func NewOAuth2Provider(opts *Options) martini.Handler {
 // Sample usage:
 // m.Get("/login-required", oauth2.LoginRequired, func() ... {})
 var LoginRequired martini.Handler = func() martini.Handler {
-	return func(s sessions.Session, c martini.Context, w http.ResponseWriter, r *http.Request) {
+	return func(u *user.User, s sessions.Session, c martini.Context, w http.ResponseWriter, r *http.Request) {
 		token := unmarshallToken(s)
 		if token == nil || token.IsExpired() {
 			next := url.QueryEscape(r.URL.RequestURI())
@@ -218,28 +229,6 @@ func logout(t *oauth.Transport, s sessions.Session, w http.ResponseWriter, r *ht
 	http.Redirect(w, r, next, codeRedirect)
 }
 
-func handleOAuth2Callback2(t *oauth.Transport, s sessions.Session, w http.ResponseWriter, r *http.Request) {
-	next := extractPath(r.URL.Query().Get("state"))
-	code := r.URL.Query().Get("code")
-	tk, err := t.Exchange(code)
-	if err != nil {
-		// Pass the error message, or allow dev to provide its own
-		// error handler.
-
-		fmt.Fprint(w, err)
-		//http.Redirect(w, r, PathError, codeRedirect)
-		return
-	}
-	// Store the credentials in the session.
-	val, _ := json.Marshal(tk)
-	s.Set(keyToken, val)
-
-
-
-
-	http.Redirect(w, r, next, codeRedirect)
-}
-
 
 
 // Function that handles the callback from the Google server.
@@ -260,9 +249,7 @@ func handleOAuth2Callback(t *oauth.Transport, s sessions.Session, w http.Respons
 	// Exchange the received code for a token.
 	token, err := t2.Exchange(code)
 	if err != nil {
-		// Pass the error message, or allow dev to provide its own
-		// error handler.
-
+	
 		c.Errorf("Can't exchange code: %v", err)
 
 		http.Redirect(w, r, PathError, codeRedirect)
@@ -273,9 +260,7 @@ func handleOAuth2Callback(t *oauth.Transport, s sessions.Session, w http.Respons
 	// Store the credentials in the session.
 	val, err := json.Marshal(token)
 	if err != nil {
-		// Pass the error message, or allow dev to provide its own
-		// error handler.
-
+	
 		c.Errorf("Can't parse credentials token: %v", err)
 
 		http.Redirect(w, r, PathError, codeRedirect)
@@ -289,9 +274,12 @@ func handleOAuth2Callback(t *oauth.Transport, s sessions.Session, w http.Respons
 
 
 	//var someStruct map[string]interface{}
-	var someStruct User
+	var someStruct user.User
 
 	message, err := ioutil.ReadAll(resp.Body)
+	
+	c.Infof("New User: %s", message)
+
 	if err != nil {
 		// Pass the error message, or allow dev to provide its own
 		// error handler.
@@ -307,7 +295,11 @@ func handleOAuth2Callback(t *oauth.Transport, s sessions.Session, w http.Respons
 	}
 
 
-	c.Infof("New User: %s", someStruct)
+	
+	newUser := user.Create(&someStruct, c)
+		
+	
+	c.Infof("New User: %s", newUser) 
 
 
 	http.Redirect(w, r, next, codeRedirect)

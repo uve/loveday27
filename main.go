@@ -17,9 +17,19 @@ import (
 	"common/oauth2"
 	"common/sessions"
 
-	"appengine"
+	//"appengine"
 
 	//"api"
+	"core/user"
+	
+	"config"
+	
+	"common/endpoints"
+	
+	"appengine/datastore"
+	"time"
+	
+	"api"
 )
 
 
@@ -41,7 +51,7 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("template execution: %s", err)
 	}
-	
+		
 	//fmt.Fprint(w, result)
 }
 
@@ -53,56 +63,122 @@ func oauth2error(w http.ResponseWriter, r *http.Request) {
 
 
 
+func PaymentsPage(u *user.User, s sessions.Session, c martini.Context, w http.ResponseWriter, r *http.Request) {
+
+	
+	
+	fmt.Fprint(w, c)	
+	 
+}
+
+
+
+
+
+
+// Greeting is a datastore entity that represents a single greeting.
+// It also serves as (a part of) a response of GreetingService.
+type Greeting struct {
+  Key     *datastore.Key `json:"id" datastore:"-"`
+  Author  string         `json:"author"`
+  Content string         `json:"content" datastore:",noindex" endpoints:"req"`
+  Date    time.Time      `json:"date"`
+}
+
+// GreetingsList is a response type of GreetingService.List method
+type GreetingsList struct {
+  Items []*Greeting `json:"items"`
+}
+
+// Request type for GreetingService.List
+type GreetingsListReq struct {
+  Limit int `json:"limit" endpoints:"d=10"`
+}
+
+
+
+
+
+
+
+
+
+
+// GreetingService can sign the guesbook, list all greetings and delete
+// a greeting from the guestbook.
+type GreetingService struct {
+}
+
+// List responds with a list of all greetings ordered by Date field.
+// Most recent greets come first.
+func (gs *GreetingService) List(
+  r *http.Request, req *GreetingsListReq, resp *GreetingsList) error {
+
+  if req.Limit <= 0 {
+    req.Limit = 10
+  }
+
+  c := endpoints.NewContext(r)
+  q := datastore.NewQuery("Greeting").Order("-Date").Limit(req.Limit)
+  greets := make([]*Greeting, 0, req.Limit)
+  keys, err := q.GetAll(c, &greets)
+  if err != nil {
+    return err
+  }
+
+  for i, k := range keys {
+    greets[i].Key = k
+  }
+  resp.Items = greets
+  return nil
+}
+
+
+
+
+
+
 
 func init() {
-
 
 
 	m := martini.Classic()
 
 
-	m.Use(sessions.Sessions("my_session", sessions.NewCookieStore([]byte("secret123"))))
-
-	var client_id string
-	var client_secret string
-	var redirect_url string
-
-
-	if ( appengine.IsDevAppServer() ) {
-
-		client_id     = "882975820932-ltfu1oa31f80o4v9tqfp8k5ghe45oibu.apps.googleusercontent.com"
-		client_secret = "RPT5XVC_X0rl-z9jcrTV0aHk"
-		redirect_url  = "http://localhost:8080/oauth2callback"
-
-	} else {
-
-		client_id     = "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com"
-		client_secret = "TCEAw8gTQBwyOKcYpqH8NTF4"
-		redirect_url  = "http://mindale.com/oauth2callback"
-	}
-
-
-	m.Use(oauth2.Google(&oauth2.Options{
-		ClientId:     client_id,
-		ClientSecret: client_secret,
-		RedirectURL:  redirect_url,
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile"},
-
-
-	}))
+	store := sessions.NewCookieStore([]byte(config.Config.CookieSecret))
+    m.Use(sessions.Sessions(config.Config.CookieName, store))
+		
+	
+	
+	params := oauth2.Options( config.Config.OAuthProviders.Google )
+	params.RedirectURL = config.Config.RedirectURL
+	m.Use(oauth2.Google(&params))	
 
 
 
 	m.Get("/oauth2error", oauth2error)
 
 
-	m.Get("/", handleMainPage)
+	//m.Get("/", testPage)
 
+	
+
+	
+
+	
+	
+	m.Get("/", handleMainPage)
+	
+	m.Get("/payments", oauth2.LoginRequired, PaymentsPage)
+	/*
+	
 	// Tokens are injected to the handlers
 	m.Get("/", func(tokens oauth2.Tokens) string {
 		if tokens.IsExpired() {
 
 
+
+	
 			return "not logged in, or the access token is expired2"
 		}
 		return "logged in"
@@ -114,10 +190,13 @@ func init() {
 	m.Get("/restrict", oauth2.LoginRequired, func(tokens oauth2.Tokens) string {
 			return tokens.Access()
 	})
-
-
-
+	*/
 
 	http.Handle("/", m)
+	
+	api.Start()
+	
+	
+	
+	
 }
-

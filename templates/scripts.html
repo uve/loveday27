@@ -1,0 +1,30 @@
+{{define "scripts"}}
+
+
+
+<script type="text/javascript">
+
+	
+	function init(){
+	
+	
+	console.log("onroot");
+
+	var ROOT = "https://mindale-com.appspot.com/_ah/api";
+	gapi.client.load('greeting', 'v1', function() {
+	  //doSomethingAfterLoading();
+	  
+	  console.log("pagi ready");
+	}, ROOT);
+
+
+	
+}
+
+	</script>
+	
+	
+	
+	<script src="https://apis.google.com/js/client.js?onload=init"></script>
+
+{{end}}

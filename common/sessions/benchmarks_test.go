@@ -5,7 +5,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"core"
 )
+
+var cookie_name   = core.GetConfig().CookieName
+var cookie_secret = core.GetConfig().CookieSecret
+
 
 func BenchmarkNoSessionsMiddleware(b *testing.B) {
 	m := testMartini()
@@ -24,8 +29,8 @@ func BenchmarkNoSessionsMiddleware(b *testing.B) {
 
 func BenchmarkSessionsNoWrites(b *testing.B) {
 	m := testMartini()
-	store := NewCookieStore([]byte("secret123"))
-	m.Use(Sessions("my_session", store))
+	store := NewCookieStore([]byte(cookie_secret))
+	m.Use(Sessions(cookie_name, store))
 	m.Get("/foo", func() string {
 		return "Foo"
 	})
@@ -41,8 +46,8 @@ func BenchmarkSessionsNoWrites(b *testing.B) {
 
 func BenchmarkSessionsWithWrite(b *testing.B) {
 	m := testMartini()
-	store := NewCookieStore([]byte("secret123"))
-	m.Use(Sessions("my_session", store))
+	store := NewCookieStore([]byte(cookie_secret))
+	m.Use(Sessions(cookie_name, store))
 	m.Get("/foo", func(s Session) string {
 		s.Set("foo", "bar")
 		return "Foo"
@@ -59,8 +64,8 @@ func BenchmarkSessionsWithWrite(b *testing.B) {
 
 func BenchmarkSessionsWithRead(b *testing.B) {
 	m := testMartini()
-	store := NewCookieStore([]byte("secret123"))
-	m.Use(Sessions("my_session", store))
+	store := NewCookieStore([]byte(cookie_secret))
+	m.Use(Sessions(cookie_secret, store))
 	m.Get("/foo", func(s Session) string {
 		s.Get("foo")
 		return "Foo"

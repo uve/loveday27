@@ -10,8 +10,8 @@
 //  func main() {
 // 	  m := martini.Classic()
 //
-// 	  store := sessions.NewCookieStore([]byte("secret123"))
-// 	  m.Use(sessions.Sessions("my_session", store))
+// 	  store := sessions.NewCookieStore([]byte(core.GetConfig().CookieSecret))
+// 	  m.Use(sessions.Sessions(core.GetConfig().CookieName, store))
 //
 // 	  m.Get("/", func(session sessions.Session) string {
 // 		  session.Set("hello", "world")

@@ -1,0 +1,27 @@
+{
+	"RootUrl":     "http://mindale.com",
+	"RedirectURL": "http://mindale.com/oauth2callback",
+	
+	"CookieName"   : "sid",
+	"CookieSecret" : "secret123mindale",
+	
+	"OAuthProviders"  : {
+		
+		"Google" : {				
+			"ClientId":     "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com",
+			"ClientSecret": "TCEAw8gTQBwyOKcYpqH8NTF4"
+		},
+		"Twitter" : {				
+			"ClientId":     "JDvJoIys05UsGKnqCLLC1SWkj",
+			"ClientSecret": "Dtvt0kvE0rjabBTBhkt5ER0xvySZN3ePcW5mdxgJTYxVyNQp1o"
+		},
+		"Facebook" : {
+		},
+		"Github" : {
+		},
+		"Twitter" : {
+		}
+		 
+	}
+           
+}

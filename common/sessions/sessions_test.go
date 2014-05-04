@@ -8,13 +8,18 @@ import (
 	"testing"
 
 	"common/martini"
+	"core"
 )
+
+var cookie_name   = core.GetConfig().CookieName
+var cookie_secret = core.GetConfig().CookieSecret
+
 
 func Test_Sessions(t *testing.T) {
 	m := martini.Classic()
 
-	store := NewCookieStore([]byte("secret123"))
-	m.Use(Sessions("my_session", store))
+	store := NewCookieStore([]byte(cookie_secret))
+	m.Use(Sessions(cookie_name, store))
 
 	m.Get("/testsession", func(session Session) string {
 		session.Set("hello", "world")
@@ -41,8 +46,8 @@ func Test_Sessions(t *testing.T) {
 func Test_SessionsDeleteValue(t *testing.T) {
 	m := martini.Classic()
 
-	store := NewCookieStore([]byte("secret123"))
-	m.Use(Sessions("my_session", store))
+	store := NewCookieStore([]byte(cookie_secret))
+	m.Use(Sessions(cookie_name, store))
 
 	m.Get("/testsession", func(session Session) string {
 		session.Set("hello", "world")
@@ -70,11 +75,11 @@ func Test_SessionsDeleteValue(t *testing.T) {
 
 func Test_Options(t *testing.T) {
 	m := martini.Classic()
-	store := NewCookieStore([]byte("secret123"))
+	store := NewCookieStore([]byte(cookie_secret))
 	store.Options(Options{
 		Domain: "martini.codegangsta.io",
 	})
-	m.Use(Sessions("my_session", store))
+	m.Use(Sessions(cookie_name, store))
 
 	m.Get("/", func(session Session) string {
 		session.Set("hello", "world")
@@ -111,8 +116,8 @@ func Test_Options(t *testing.T) {
 func Test_Flashes(t *testing.T) {
 	m := martini.Classic()
 
-	store := NewCookieStore([]byte("secret123"))
-	m.Use(Sessions("my_session", store))
+	store := NewCookieStore([]byte(cookie_secret))
+	m.Use(Sessions(cookie_name, store))
 
 	m.Get("/set", func(session Session) string {
 		session.AddFlash("hello world")
@@ -158,8 +163,8 @@ func Test_SessionsClear(t *testing.T) {
 		"apples": "oranges",
 	}
 
-	store := NewCookieStore([]byte("secret123"))
-	m.Use(Sessions("my_session", store))
+	store := NewCookieStore([]byte(cookie_secret))
+	m.Use(Sessions(cookie_name, store))
 
 	m.Get("/testsession", func(session Session) string {
 		for k, v := range data {
