@@ -13,6 +13,23 @@ import (
 	"time"
 	
 	"net/http"
+
+	"appengine/user"
+	"errors"
+	"config"
+
+
+)
+
+
+//const clientId = "YOUR-CLIENT-ID"
+var clientId = config.Config.OAuthProviders.Google.ClientId
+
+var (
+	scopes    = []string{endpoints.EmailScope}
+	clientIds = []string{clientId, endpoints.ApiExplorerClientId}
+	// in case we'll want to use TicTacToe API from an Android app
+	audiences = []string{clientId}
 )
 
 
@@ -49,11 +66,31 @@ type GreetingService struct {
 func (gs *GreetingService) List(
   r *http.Request, req *GreetingsListReq, resp *GreetingsList) error {
 
+
+
+
   if req.Limit <= 0 {
     req.Limit = 10
   }
 
   c := endpoints.NewContext(r)
+
+
+
+
+
+  u, err := getCurrentUser(c)
+  if err != nil {
+ 	return err
+  }
+
+
+  c.Infof("GreetingService list execute...")
+
+  c.Infof(userId(u))
+
+
+
   q := datastore.NewQuery("Greeting").Order("-Date").Limit(req.Limit)
   greets := make([]*Greeting, 0, req.Limit)
   keys, err := q.GetAll(c, &greets)
@@ -70,22 +107,48 @@ func (gs *GreetingService) List(
 
 
 
-
-func Start() {
-
-
-	greetService := &GreetingService{}
-	api, err := endpoints.RegisterService(greetService,
-	    "greeting", "v1", "Greetings API", true)
+// getCurrentUser retrieves a user associated with the request.
+// If there's no user (e.g. no auth info present in the request) returns
+// an "unauthorized" error.
+func getCurrentUser(c endpoints.Context) (*user.User, error) {
+	u, err := endpoints.CurrentUser(c, scopes, audiences, clientIds)
 	if err != nil {
-	   panic(err.Error())
+		return nil, err
 	}
-	
-	info := api.MethodByName("List").Info()
+	if u == nil {
+		return nil, errors.New("Unauthorized: Please, sign in.")
+	}
+	c.Debugf("Current user: %#v", u)
+	return u, nil
+}
+
+
+// userId returns a string ID of the user u to be used as Player of Score.
+func userId(u *user.User) string {
+	return u.String()
+}
+
+
+
+// RegisterService exposes TicTacToeApi methods as API endpoints.
+//
+// The registration/initialization during startup is not performed here but
+// in app package. It is separated from this package (tictactoe) so that the
+// service and its methods defined here can be used in another app,
+// e.g. http://github.com/crhym3/go-endpoints.appspot.com.
+func RegisterService() (*endpoints.RpcService, error) {
+
+	api := &GreetingService{}
+	rpcService, err := endpoints.RegisterService(api,
+		"greeting", "v1", "Greetings API", true)
+	if err != nil {
+		return nil, err
+	}
+
+	info := rpcService.MethodByName("List").Info()
 	info.Name, info.HttpMethod, info.Path, info.Desc =
-	   "greets.list", "GET", "greetings", "List most recent greetings."
-	
-		
-	endpoints.HandleHttp()
-		
+		"greets.list", "GET", "greetings", "List most recent greetings."
+	info.Scopes, info.ClientIds, info.Audiences = scopes, clientIds, audiences
+
+	return rpcService, nil
 }

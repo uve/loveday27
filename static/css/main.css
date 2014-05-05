@@ -3,7 +3,7 @@
 }
 
 .use-sprite {      
-      background-image: url('/img/sprite.png');
+      background-image: url('/images/sprite.png');
 }
 
   
@@ -19,7 +19,7 @@
         background-size: 640px 410px;
       }
       .use-sprite {
-        background-image: url('/img/sprite.png');
+        background-image: url('/images/sprite.png');
         /*background-image: url('http://d3qg9zffrnl4ph.cloudfront.net/static/build/sites-icons@2x.1390551848133.png');*/
       }
      }
@@ -1073,14 +1073,14 @@ input:focus:invalid {
 .app-screenshot {
     width: 820px;
     height: 420px;
-    background-image: url(../img/screenshot/apps.jpg);
+    background-image: url(../images/screenshot/apps.jpg);
     background-size: 820px 420px;
     margin: 20px auto 10px
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5),only screen and (min--moz-device-pixel-ratio:1.5),only screen and (-o-min-device-pixel-ratio:3/2),only screen and (min-device-pixel-ratio:1.5),only screen and (min-resolution:1144dpi),only screen and (min-resolution:1.5dppx) {
     .app-screenshot {
-        background-image:url(../img/screenshot/apps@2.jpg)
+        background-image:url(../images/screenshot/apps@2.jpg)
     }
 }
 

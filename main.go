@@ -17,7 +17,7 @@ import (
 	"common/oauth2"
 	"common/sessions"
 
-	//"appengine"
+
 
 	//"api"
 	"core/user"
@@ -25,11 +25,10 @@ import (
 	"config"
 	
 	"common/endpoints"
-	
-	"appengine/datastore"
-	"time"
-	
-	"api"
+
+
+	"tictactoe"
+
 )
 
 
@@ -41,13 +40,27 @@ func serve404(w http.ResponseWriter) {
 }
 
 
+type Params struct {
+	ClientId  string
+}
+
+
+
 
 func handleMainPage(w http.ResponseWriter, r *http.Request) {
 
-	t := template.New("main.html")
-	t = template.Must(t.ParseGlob("templates/*.html"))
-	
-	err := t.Execute(w, nil)
+
+
+	t := template.Must(template.New("main.html").ParseGlob("templates/*.html"))
+
+
+	params := Params{
+		ClientId: config.Config.OAuthProviders.Google.ClientId,
+	}
+
+
+
+	err := t.Execute(w, params)
 	if err != nil {
 		log.Fatalf("template execution: %s", err)
 	}
@@ -76,68 +89,6 @@ func PaymentsPage(u *user.User, s sessions.Session, c martini.Context, w http.Re
 
 
 
-// Greeting is a datastore entity that represents a single greeting.
-// It also serves as (a part of) a response of GreetingService.
-type Greeting struct {
-  Key     *datastore.Key `json:"id" datastore:"-"`
-  Author  string         `json:"author"`
-  Content string         `json:"content" datastore:",noindex" endpoints:"req"`
-  Date    time.Time      `json:"date"`
-}
-
-// GreetingsList is a response type of GreetingService.List method
-type GreetingsList struct {
-  Items []*Greeting `json:"items"`
-}
-
-// Request type for GreetingService.List
-type GreetingsListReq struct {
-  Limit int `json:"limit" endpoints:"d=10"`
-}
-
-
-
-
-
-
-
-
-
-
-// GreetingService can sign the guesbook, list all greetings and delete
-// a greeting from the guestbook.
-type GreetingService struct {
-}
-
-// List responds with a list of all greetings ordered by Date field.
-// Most recent greets come first.
-func (gs *GreetingService) List(
-  r *http.Request, req *GreetingsListReq, resp *GreetingsList) error {
-
-  if req.Limit <= 0 {
-    req.Limit = 10
-  }
-
-  c := endpoints.NewContext(r)
-  q := datastore.NewQuery("Greeting").Order("-Date").Limit(req.Limit)
-  greets := make([]*Greeting, 0, req.Limit)
-  keys, err := q.GetAll(c, &greets)
-  if err != nil {
-    return err
-  }
-
-  for i, k := range keys {
-    greets[i].Key = k
-  }
-  resp.Items = greets
-  return nil
-}
-
-
-
-
-
-
 
 func init() {
 
@@ -152,7 +103,7 @@ func init() {
 	
 	params := oauth2.Options( config.Config.OAuthProviders.Google )
 	params.RedirectURL = config.Config.RedirectURL
-	m.Use(oauth2.Google(&params))	
+	m.Use(oauth2.Google(&params))
 
 
 
@@ -163,9 +114,6 @@ func init() {
 
 	
 
-	
-
-	
 	
 	m.Get("/", handleMainPage)
 	
@@ -193,8 +141,22 @@ func init() {
 	*/
 
 	http.Handle("/", m)
-	
-	api.Start()
+
+	/*
+	if _, err := api.RegisterService(); err != nil {
+		panic(err.Error())
+	}
+	*/
+
+
+	if _, err := tictactoe.RegisterService(); err != nil {
+		panic(err.Error())
+	}
+
+
+	endpoints.HandleHttp()
+
+	//api.Start()
 	
 	
 	

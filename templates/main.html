@@ -1,5 +1,5 @@
-
 {{template "header"}}
+
 
 <div class="top-nav">
     <div class="content">
@@ -9,12 +9,20 @@
           <div class="box nav-link show-pointer" id="features">Features</div>
           <a class="box nav-link show-pointer" id="support" href="http://www.mindale.com/forum" target="ablank">Support</a>
         </div>
-        <div class="login-out-area box color-light">
-          <!-- <div class="show-pointer box button" id="signup-entry">Sign Up</div> -->
-          <!--<div class="show-pointer box" id="login-entry">Sign in</div> -->
-            <a href="/login"><div class="show-pointer box button" id="signup-entry">Log In</div></a>
-            <a href="/logout"><div class="show-pointer box" id="signup-entry">Log Out</div></a>
+
+        <div id="signin">
+            <a onclick="mindale.auth();" id="signinButton">Sign in!</a>
+            <span id="userLabel">(not signed in)</span>
         </div>
+
+        <!--
+
+        <div class="login-out-area box color-light">
+
+            <a href="f" onclick="google.devrel.samples.ttt.auth();" id="signinButton"><div class="show-pointer box button" id="signup-entry">Log In</div></a>
+            <a onclick="logout();"><div class="show-pointer box" id="signup-entry">Log Out</div></a>
+        </div>
+        <!--
     </div>
 </div>
 
@@ -226,5 +234,7 @@
   <!--  
   <script type="text/javascript" src="http://d3qg9zffrnl4ph.cloudfront.net/static/build/landing.fedadc040fb3853e7ac46c85a679c9ee.js"></script>
   -->
-  
+
+
+
 {{template "footer"}}
