@@ -2,22 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e3381fc1-dc21-4e57-a66a-f00e652a6c12" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mindale.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/css/main.css" afterPath="$PROJECT_DIR$/static/css/main.css" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/img/icon512.png" afterPath="$PROJECT_DIR$/static/images/icon512.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/img/icon512.svg" afterPath="$PROJECT_DIR$/static/images/icon512.svg" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/img/screenshot/apps.jpg" afterPath="$PROJECT_DIR$/static/images/screenshot/apps.jpg" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/img/screenshot/apps@2.jpg" afterPath="$PROJECT_DIR$/static/images/screenshot/apps@2.jpg" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/img/sprite.png" afterPath="$PROJECT_DIR$/static/images/sprite.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/js/main.js" afterPath="$PROJECT_DIR$/static/js/main.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/api/api.go" afterPath="$PROJECT_DIR$/api/api.go" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.yaml" afterPath="$PROJECT_DIR$/app.yaml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/header.html" afterPath="$PROJECT_DIR$/templates/header.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.go" afterPath="$PROJECT_DIR$/main.go" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/main.html" afterPath="$PROJECT_DIR$/templates/main.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/scripts.html" afterPath="$PROJECT_DIR$/templates/scripts.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mindale.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -73,8 +58,8 @@
       <file leaf-file-name="app.yaml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.yaml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.28228784" vertical-offset="0" max-vertical-offset="867">
-              <caret line="9" column="5" selection-start-line="9" selection-start-column="5" selection-end-line="9" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.78413284" vertical-offset="0" max-vertical-offset="867">
+              <caret line="25" column="14" selection-start-line="25" selection-start-column="14" selection-end-line="25" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -615,12 +600,12 @@
       <changelist id="e3381fc1-dc21-4e57-a66a-f00e652a6c12" name="Default" comment="" />
       <created>1399269274511</created>
       <updated>1399269274511</updated>
-      <workItem from="1399269277423" duration="16838000" />
+      <workItem from="1399269277423" duration="17727000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16838000" />
+    <option name="totallyTimeSpent" value="17727000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1399" y="84" width="1375" height="803" extended-state="0" />
@@ -845,8 +830,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.yaml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.28228784" vertical-offset="0" max-vertical-offset="867">
-          <caret line="9" column="5" selection-start-line="9" selection-start-column="5" selection-end-line="9" selection-end-column="5" />
+        <state vertical-scroll-proportion="0.78413284" vertical-offset="0" max-vertical-offset="867">
+          <caret line="25" column="14" selection-start-line="25" selection-start-column="14" selection-end-line="25" selection-end-column="14" />
           <folding />
         </state>
       </provider>
