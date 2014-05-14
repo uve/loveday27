@@ -1,4 +1,4 @@
-package tictactoe
+package api
 
 import (
 	"time"
@@ -21,6 +21,13 @@ type Score struct {
 	Played  time.Time `datastore:"played"`
 	Player  string    `datastore:"player"`
 }
+
+
+
+
+
+
+
 
 // Turns the Score struct/entity into a ScoreRespMsg which is then used
 // as an API response.
@@ -56,6 +63,8 @@ func (s *Score) put(c appengine.Context) (err error) {
 func newScore(outcome string, u *user.User) *Score {
 	return &Score{Outcome: outcome, Played: time.Now(), Player: userId(u)}
 }
+
+
 
 // newUserScoreQuery returns a Query which can be used to list all previous
 // games of a user.

@@ -87,6 +87,8 @@ func (m *ServiceMethod) Info() *MethodInfo {
 	return m.info
 }
 
+
+
 // MethodInfo is what's used to construct Endpoints API config
 type MethodInfo struct {
 	// name can also contain resource, e.g. "greets.list"

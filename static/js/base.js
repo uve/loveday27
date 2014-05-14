@@ -94,13 +94,16 @@ mindale.userAuthed = function() {
     if (!resp.code) {
       var token = gapi.auth.getToken();
       // Use id_token instead of bearer token
-      token.access_token = token.id_token;
+      //token.access_token = token.id_token;
       gapi.auth.setToken(token);
       mindale.signedIn = true;
       document.getElementById('userLabel').innerHTML = resp.email;
       document.getElementById('signinButton').innerHTML = 'Sign out';
-     // mindale.setBoardEnablement(true);
+      //mindale.setBoardEnablement(true);
       //mindale.queryScores();
+
+      mindale.payments();
+
     }
   });
 };
@@ -128,9 +131,33 @@ mindale.auth = function() {
     mindale.signedIn = false;
     document.getElementById('userLabel').innerHTML = '(not signed in)';
     document.getElementById('signinButton').innerHTML = 'Sign in';
+
+
+
     //mindale.setBoardEnablement(false);
   }
+
+
 };
+
+
+
+/**
+ * Queries for results of previous games.
+ */
+mindale.payments = function() {
+
+    console.log('Loading payments');
+
+
+    gapi.client.mindale.scores.list().execute(function(resp) {
+
+
+        console.log(resp);
+    });
+};
+
+
 
 /**
  * Handles a square click.
@@ -173,7 +200,7 @@ mindale.resetGame = function() {
  * @param {string} boardString Current state of the board.
  */
 mindale.getComputerMove = function(boardString) {
-  gapi.client.tictactoe.board.getmove({'state': boardString}).execute(
+  gapi.client.mindale.board.getmove({'state': boardString}).execute(
       function(resp) {
     mindale.setBoardFilling(resp.state);
     var status = mindale.checkForVictory(resp.state);
@@ -190,7 +217,7 @@ mindale.getComputerMove = function(boardString) {
  * @param {number} status Result of the game.
  */
 mindale.sendResultToServer = function(status) {
-  gapi.client.tictactoe.scores.insert({'outcome':
+  gapi.client.mindale.scores.insert({'outcome':
       mindale.STATUS_STRINGS[status]}).execute(
       function(resp) {
     mindale.queryScores();
@@ -201,7 +228,7 @@ mindale.sendResultToServer = function(status) {
  * Queries for results of previous games.
  */
 mindale.queryScores = function() {
-  gapi.client.tictactoe.scores.list().execute(function(resp) {
+  gapi.client.mindale.scores.list().execute(function(resp) {
     var history = document.getElementById('gameHistory');
     history.innerHTML = '';
     if (resp.items) {
@@ -358,15 +385,18 @@ mindale.init = function(apiRoot) {
   }
 
   apisToLoad = 2; // must match number of calls to gapi.client.load()
-  gapi.client.load('tictactoe', 'v1', callback, apiRoot);
+  gapi.client.load('mindale', 'v1', callback, apiRoot);
   gapi.client.load('oauth2', 'v2', callback);
 
+
+
+    /*
   var buttons = document.querySelectorAll('td');
   for (var i = 0; i < buttons.length; i++) {
     var button = buttons[i];
     button.addEventListener('click', mindale.clickSquare);
   }
-
+*/
    /*
   var reset = document.querySelector('#restartButton');
   reset.addEventListener('click', mindale.resetGame);

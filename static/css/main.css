@@ -2068,3 +2068,9 @@ hr {
         background-size: 969px 427px
     }
 }
+
+
+
+#signin a {
+    cursor: pointer;
+}

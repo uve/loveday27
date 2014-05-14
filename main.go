@@ -18,8 +18,6 @@ import (
 	"common/sessions"
 
 
-
-	//"api"
 	"core/user"
 	
 	"config"
@@ -27,7 +25,7 @@ import (
 	"common/endpoints"
 
 
-	"tictactoe"
+	"api"
 
 )
 
@@ -142,23 +140,11 @@ func init() {
 
 	http.Handle("/", m)
 
-	/*
+
 	if _, err := api.RegisterService(); err != nil {
 		panic(err.Error())
 	}
-	*/
-
-
-	if _, err := tictactoe.RegisterService(); err != nil {
-		panic(err.Error())
-	}
-
 
 	endpoints.HandleHttp()
 
-	//api.Start()
-	
-	
-	
-	
 }
