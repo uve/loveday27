@@ -2,7 +2,7 @@
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
-package main
+package default
 
 import (
 
@@ -22,11 +22,11 @@ import (
 	
 	"config"
 	
-	"github.com/crhym3/go-endpoints/endpoints"
+	//"github.com/crhym3/go-endpoints/endpoints"
 	
 
 	//"default/tictactoe"
-	"api"
+	//"api"
 
 )
 
@@ -53,7 +53,7 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 	//t := template.Must(template.New("main.html").ParseGlob("default/templates/*.html"))
 	//t := template.Must(template.New("index.html").ParseGlob("default/templates/*.html"))
 	
-	t, _ := template.ParseFiles("default/polymer/index.html")
+	//t, _ := template.ParseFiles("polymer/index.html")
 
 
 	params := Params{
@@ -61,12 +61,17 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 		ClientId: "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com",
 	}
 
-
-
-	err := t.Execute(w, params)
-	if err != nil {
-		log.Fatalf("template execution: %s", err)
-	}
+	
+	var index = template.Must(template.ParseFiles("frontend/polymer/index.html"))
+	
+	 err := index.Execute(w, params)
+     if err != nil {
+     	log.Fatalf("template execution: %s", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+     }
+    
+    
+	
 		
 	//fmt.Fprint(w, result)
 }
@@ -145,11 +150,13 @@ func init() {
 
 	http.Handle("/", m)
 
+   /*
 
 	if _, err := api.RegisterService(); err != nil {
 		panic(err.Error())
 	}
 
 	endpoints.HandleHttp()
+	*/
 
 }

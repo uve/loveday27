@@ -25,6 +25,8 @@ skip_files:
 - ^(.*/)?.*README
 - ^(.*/)?.*COPYING
 - ^(.*/)?.*marked
+- ^(.*/)?.*pkg
+- ^(.*/)?.*.a
 
 
 handlers:
@@ -37,7 +39,6 @@ handlers:
   
 - url: /polymer
   static_dir: default/polymer
-
 
 - url: /static
   static_dir: default/static

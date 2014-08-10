@@ -26,11 +26,9 @@ type Score struct {
 
 
 
-
-
-
 // Turns the Score struct/entity into a ScoreRespMsg which is then used
 // as an API response.
+/*
 func (s *Score) toMessage(msg *ScoreRespMsg) *ScoreRespMsg {
 	if msg == nil {
 		msg = &ScoreRespMsg{}
@@ -40,6 +38,7 @@ func (s *Score) toMessage(msg *ScoreRespMsg) *ScoreRespMsg {
 	msg.Played = s.timestamp()
 	return msg
 }
+*/
 
 // timestamp formats date/time of the score.
 func (s *Score) timestamp() string {
