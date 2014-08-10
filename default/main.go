@@ -18,7 +18,6 @@ import (
 	"github.com/martini-contrib/sessions"
 	
 
-	//"api"
 	"core/user"
 	
 	"config"
@@ -26,7 +25,8 @@ import (
 	"github.com/crhym3/go-endpoints/endpoints"
 	
 
-	"default/tictactoe"
+	//"default/tictactoe"
+	"api"
 
 )
 
@@ -142,23 +142,11 @@ func init() {
 
 	http.Handle("/", m)
 
-	/*
+
 	if _, err := api.RegisterService(); err != nil {
 		panic(err.Error())
 	}
-	*/
-
-
-	if _, err := tictactoe.RegisterService(); err != nil {
-		panic(err.Error())
-	}
-
 
 	endpoints.HandleHttp()
 
-	//api.Start()
-	
-	
-	
-	
 }
