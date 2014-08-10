@@ -3,7 +3,7 @@ application: mindale-com
 dispatch:
 # Default module serves the typical web resources and all static resources.
 - url: "*/*"
-  module: default
+  module: frontend
 
 # Send all backend traffic to the backend.
 #- url: "*/backend/*"
