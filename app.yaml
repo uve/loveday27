@@ -21,6 +21,9 @@ handlers:
   upload:  default/static/favicon.ico
   secure: optional
   
+  
+- url: /polymer
+  static_dir: default/polymer
 
 - url: /static
   static_dir: default/static

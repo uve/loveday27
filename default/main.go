@@ -50,7 +50,10 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 
 
 
-	t := template.Must(template.New("main.html").ParseGlob("default/templates/*.html"))
+	//t := template.Must(template.New("main.html").ParseGlob("default/templates/*.html"))
+	//t := template.Must(template.New("index.html").ParseGlob("default/templates/*.html"))
+	
+	t, _ := template.ParseFiles("default/polymer/index.html")
 
 
 	params := Params{
