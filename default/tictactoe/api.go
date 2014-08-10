@@ -9,12 +9,13 @@ import (
 
 	"appengine/user"
 
-	"common/endpoints"
+	"github.com/crhym3/go-endpoints/endpoints"
 
-	"config"
+	//"config"
 )
 
-var clientId = config.Config.OAuthProviders.Google.ClientId
+//var clientId = config.Config.OAuthProviders.Google.ClientId
+var clientId = "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com"
 
 var (
 	scopes    = []string{endpoints.EmailScope}

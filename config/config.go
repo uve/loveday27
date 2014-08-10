@@ -7,7 +7,8 @@ import (
 	//"common/oauth"
 	
 	"appengine"
-	"common/oauth2"
+	
+	"github.com/martini-contrib/oauth2"
 )
 
 

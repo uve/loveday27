@@ -7,7 +7,7 @@ package api
 import (
 
 
-	"common/endpoints"
+	"github.com/crhym3/go-endpoints/endpoints"
 	
 	"appengine/datastore"
 	"time"
@@ -16,14 +16,15 @@ import (
 
 	"appengine/user"
 	"errors"
-	"config"
+	//"config"
 
 
 )
 
 
 //const clientId = "YOUR-CLIENT-ID"
-var clientId = config.Config.OAuthProviders.Google.ClientId
+//var clientId = config.Config.OAuthProviders.Google.ClientId
+var clientId = "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com"
 
 var (
 	scopes    = []string{endpoints.EmailScope}

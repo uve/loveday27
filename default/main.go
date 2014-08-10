@@ -13,21 +13,20 @@ import (
 	"net/http"
 	"text/template"
 
-	"common/martini"
-	"common/oauth2"
-	"common/sessions"
-
-
+	"github.com/go-martini/martini"	
+	"github.com/martini-contrib/oauth2"
+	"github.com/martini-contrib/sessions"
+	
 
 	//"api"
 	"core/user"
 	
 	"config"
 	
-	"common/endpoints"
+	"github.com/crhym3/go-endpoints/endpoints"
+	
 
-
-	"tictactoe"
+	"default/tictactoe"
 
 )
 
@@ -51,11 +50,12 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 
 
 
-	t := template.Must(template.New("main.html").ParseGlob("templates/*.html"))
+	t := template.Must(template.New("main.html").ParseGlob("default/templates/*.html"))
 
 
 	params := Params{
-		ClientId: config.Config.OAuthProviders.Google.ClientId,
+		//ClientId: config.Config.OAuthProviders.Google.ClientId,
+		ClientId: "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com",
 	}
 
 
@@ -101,9 +101,9 @@ func init() {
 		
 	
 	
-	params := oauth2.Options( config.Config.OAuthProviders.Google )
-	params.RedirectURL = config.Config.RedirectURL
-	m.Use(oauth2.Google(&params))
+	//params := oauth2.Options( config.Config.OAuthProviders.Google )
+	//params.RedirectURL = config.Config.RedirectURL
+	//m.Use(oauth2.Google(&params))
 
 
 
