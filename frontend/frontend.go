@@ -62,8 +62,8 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	
-	var index = template.Must(template.ParseFiles("frontend/polymer/index.html"))
-	
+	var index = template.Must(template.ParseFiles("polymer/index.html"))
+
 	 err := index.Execute(w, params)
      if err != nil {
      	log.Fatalf("template execution: %s", err)
