@@ -1,0 +1,23 @@
+application: mindale-com
+# No version required, this does routing independent of version
+
+dispatch:
+  # Default module serves the typical web resources and all static resources.
+  - url: "*"
+    module: default
+
+  # Default module serves the typical web resources and all static resources.
+  #- url: "*/favicon.ico"
+  #  module: default
+
+  # Default module serves simple hostname request.
+  #- url: "simple-sample.appspot.com/"
+  #  module: default
+
+  # Send all mobile traffic to the mobile frontend.
+  #- url: "*/mobile/*"
+  #  module: mobile-frontend
+
+  # Send all work to the one static backend. 
+  #- url: "*/work/*"
+  #  module: static-backend
