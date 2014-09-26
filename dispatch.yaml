@@ -4,6 +4,9 @@ application: mindale-com
 dispatch:
   # Default module serves the typical web resources and all static resources.
 
+  #- url: "*/*"
+  #  module: frontend
+
   # Default module serves the typical web resources and all static resources.
   #- url: "*/favicon.ico"
   #  module: default

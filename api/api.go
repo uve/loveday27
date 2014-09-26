@@ -9,7 +9,7 @@ import (
 
 	"appengine/user"
 
-	"github.com/crhym3/go-endpoints/endpoints"
+	"crhym3/go-endpoints/endpoints"
 	
 	//"appengine/datastore"
 

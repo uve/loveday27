@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"os"
 	"encoding/json"
-	//"common/oauth"
+	//"oauth"
 	
 	"appengine"
-	
-	"github.com/martini-contrib/oauth2"
+
+	//"github.com/martini-contrib/oauth2"
 )
 
 
 const config_prod = "config/config_prod.json"
 const config_dev  = "config/config_dev.json"
 
-
+/*
 type OAuthProviders struct{
 
 	Google    oauth2.Options
@@ -25,14 +25,14 @@ type OAuthProviders struct{
 	
 }
 
-
+*/
 var Config = struct {
 
 	
 	CookieName string
 	CookieSecret string
 	
-	OAuthProviders OAuthProviders
+	//OAuthProviders OAuthProviders
 	// Your OAuth configuration information for protected user data access.
 	//OAuthConfig oauth.Config
 	

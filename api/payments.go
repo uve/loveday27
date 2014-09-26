@@ -3,7 +3,7 @@ package api
 import (
 
 	"net/http"
-	"github.com/crhym3/go-endpoints/endpoints"
+	"crhym3/go-endpoints/endpoints"
 )
 
 

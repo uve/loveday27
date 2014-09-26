@@ -2,11 +2,18 @@
 <html>
   <head>
     <!-- 1. Load platform.js for polyfill support. -->
-    <script src="polymer/bower_components/platform/platform.js"></script>
+
+    <script src="https://storage.googleapis.com/mindale/polymer/bower_components/platform/platform.js"></script>
 
     <!-- 2. Use an HTML Import to bring in the element. -->
-    <link rel="import"
-          href="polymer/bower_components/core-ajax/core-ajax.html">
+    <link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-ajax/core-ajax.html">
+
+    <link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-fab/paper-fab.html">
+    <link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-icons/core-icons.html">
+
+
+
+
   </head>
   <body>
     <!-- 3. Declare the element. Configure using its attributes. -->
@@ -14,6 +21,11 @@
                handleAs="json"></core-ajax>
 
 	Hello Polymer555 - GITHUB working
+
+    <paper-fab icon="favorite"></paper-fab>
+    <paper-fab class="mini" icon="settings"></paper-fab>
+    <paper-fab icon="cloud-done"></paper-fab>
+
     <script>
       // Wait for 'polymer-ready'. Ensures the element is upgraded.
       window.addEventListener('polymer-ready', function(e) {
@@ -29,3 +41,4 @@
     </script>
   </body>
 </html>
+
