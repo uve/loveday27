@@ -1,4 +1,4 @@
-application: mindale-com
+# application: mindale-com
 # No version required, this does routing independent of version
 
 dispatch:
