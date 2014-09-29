@@ -15,8 +15,11 @@ default_expiration: "1s"
 
 
 skip_files:
-- ^(.*/)?.*#
-- ^(.*/)?.*~
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
 - ^(.*/)?.*.md
 - ^(.*/)?.*.log
 - ^(.*/)?.*Makefile
@@ -28,6 +31,9 @@ skip_files:
 - ^(.*/)?.*pkg
 - ^(.*/)?.*.a
 - polymer/bower_components/*
+- ^(.*/)?bower_components$
+- ^(.*/)?.*/bower_components/.*$
+
 
 
 handlers:
