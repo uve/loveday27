@@ -1,44 +1,22 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- 1. Load platform.js for polyfill support. -->
-
-    <script src="https://storage.googleapis.com/mindale/polymer/bower_components/platform/platform.js"></script>
-
-    <!-- 2. Use an HTML Import to bring in the element. -->
-    <link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-ajax/core-ajax.html">
-
-    <link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/paper-fab/paper-fab.html">
-    <link rel="import" href="https://storage.googleapis.com/mindale/polymer/bower_components/core-icons/core-icons.html">
 
 
+  <script src="/polymer/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <!---
+    <link rel="import" href="bower_components/paper-fab/paper-fab.html">
+    <link rel="import" href="bower_components/core-icons/core-icons.html">
+  -->
 
+
+  <link rel="import" href="/polymer/app.html">
 
   </head>
   <body>
-    <!-- 3. Declare the element. Configure using its attributes. -->
-    <core-ajax url="http://example.com/json"
-               handleAs="json"></core-ajax>
 
-	Hello Polymer555 - GITHUB working
+      <main-app></main-app>
 
-    <paper-fab icon="favorite"></paper-fab>
-    <paper-fab class="mini" icon="settings"></paper-fab>
-    <paper-fab icon="cloud-done"></paper-fab>
-
-    <script>
-      // Wait for 'polymer-ready'. Ensures the element is upgraded.
-      window.addEventListener('polymer-ready', function(e) {
-        var ajax = document.querySelector('core-ajax');
-
-        // Respond to events it fires.
-        ajax.addEventListener('core-response', function(e) {
-          console.log(this.response);
-        });
-
-        ajax.go(); // Call its API methods.
-      });
-    </script>
   </body>
 </html>
 

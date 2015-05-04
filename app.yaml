@@ -48,6 +48,21 @@ handlers:
   upload:  polymer/index.html
   application_readable: true
 
+- url: /templates/index.html
+  static_files: templates/index.html
+  upload:  templates/index.html
+  application_readable: true
+
+- url: /polymer
+  static_dir: polymer
+
+- url: /templates
+  static_dir: templates  
+
+- url: /static
+  static_dir: static  
+
+
 - url: /.*
   script: _go_app
 
@@ -56,7 +71,7 @@ handlers:
 # Important! Even though there's a catch all routing above,
 # without these two lines it's not going to work.
 # Make sure you have this:
-- url: /_ah/spi/.*
-  script: _go_app
-  secure: always  
-  
+#- url: /_ah/spi/.*
+#  script: _go_app
+#  secure: always  
+#  

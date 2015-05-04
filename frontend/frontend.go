@@ -4,20 +4,20 @@ import (
 
 	"io"
 	"log"
-	"fmt"
+	//"fmt"
 
 	"net/http"
 	"text/template"
 
 
-	"github.com/martini-contrib/oauth2"
-	"github.com/martini-contrib/sessions"
-    "github.com/go-martini/martini"
+	//"github.com/martini-contrib/oauth2"
+	//"github.com/martini-contrib/sessions"
+    //"github.com/go-martini/martini"
 	//"github.com/martini-contrib/cors"
 
-	"core/user"
+	//"core/user"
 
-	"config"
+	//"config"
 	//"github.com/crhym3/go-endpoints/endpoints"
 
 
@@ -40,8 +40,30 @@ type Params struct {
 
 
 
-
 func handleMainPage(w http.ResponseWriter, r *http.Request) {
+
+
+
+
+	params := Params{
+		//ClientId: config.Config.OAuthProviders.Google.ClientId,
+		ClientId: "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com",
+	}
+
+
+	var index = template.Must(template.ParseFiles("templates/index.html"))
+
+	err := index.Execute(w, params)
+    if err != nil {
+    	log.Fatalf("template execution: %s", err)
+    	http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+
+	
+}
+
+
+func handleMapPage(w http.ResponseWriter, r *http.Request) {
 
 
 
@@ -54,19 +76,16 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 
 	var index = template.Must(template.ParseFiles("polymer/index.html"))
 
-	 err := index.Execute(w, params)
-     if err != nil {
-     	log.Fatalf("template execution: %s", err)
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-     }
+	err := index.Execute(w, params)
+    if err != nil {
+    	log.Fatalf("template execution: %s", err)
+    	http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 
-
-
-
-	//fmt.Fprint(w, result)
+	
 }
 
-
+/*
 func oauth2error(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprint(w, "Auth error")
@@ -82,7 +101,7 @@ func PaymentsPage(u *user.User, s sessions.Session, c martini.Context, w http.Re
 
 }
 
-
+*/
 
 
 
@@ -90,16 +109,15 @@ func PaymentsPage(u *user.User, s sessions.Session, c martini.Context, w http.Re
 
 func init() {
 
-
-	m := martini.Classic()
-
-
-
-
-
+	
+	http.HandleFunc("/map", handleMapPage)
+	http.HandleFunc("/", handleMainPage)
+	
 
 
 	/*
+
+	m := martini.Classic()
 	// CORS for https://foo.* origins, allowing:
 	// - PUT and PATCH methods
 	// - Origin header
@@ -112,7 +130,7 @@ func init() {
 		AllowCredentials: true,
 	}))
 	//w.Header().Set("Access-Control-Allow-Origin", "https://storage.googleapis.com")
-	*/
+	
 
 	//params := oauth2.Options( config.Config.OAuthProviders.Google )
 	//params.RedirectURL = config.Config.RedirectURL
@@ -154,9 +172,11 @@ func init() {
 	m.Get("/restrict", oauth2.LoginRequired, func(tokens oauth2.Tokens) string {
 			return tokens.Access()
 	})
-	*/
+	
+	
 
 	http.Handle("/", m)
+	*/
 
 
    /*
