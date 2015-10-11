@@ -4,12 +4,16 @@ import (
 
 	"io"
 	"log"
-	//"fmt"
 
-	"net/http"
 	"text/template"
 
 
+ 	"fmt"
+	"net/http"
+
+	"appengine"
+	"appengine/mail"
+	
 	//"github.com/martini-contrib/oauth2"
 	//"github.com/martini-contrib/sessions"
     //"github.com/go-martini/martini"
@@ -103,15 +107,39 @@ func PaymentsPage(u *user.User, s sessions.Session, c martini.Context, w http.Re
 
 */
 
+const confirmMessage = `
+Thank you for creating an account!
+Please confirm your email address by clicking on the link below:
 
+%s
+`
 
+func confirm(w http.ResponseWriter, r *http.Request) {
+        c := appengine.NewContext(r)
+        //addr := r.FormValue("email")
+        //url := createConfirmationURL(r)
 
+		addrs := []string{"check-auth@verifier.port25.com"}//, "nikita.grachev@gmail.com"}
+
+		url := "mindale.com"
+        
+        msg := &mail.Message{
+                Sender:  "Mindale Localization Services <mail@mindale.com>",
+                To:      addrs,
+                Subject: "Confirm your registration",
+                Body:    fmt.Sprintf(confirmMessage, url),
+        }
+        if err := mail.Send(c, msg); err != nil {
+                c.Errorf("Couldn't send email: %v", err)
+        }
+}
 
 func init() {
 
 	
 	http.HandleFunc("/map", handleMapPage)
 	http.HandleFunc("/", handleMainPage)
+	http.HandleFunc("/send", confirm)
 	
 
 
