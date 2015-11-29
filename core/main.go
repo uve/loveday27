@@ -19,7 +19,6 @@ type Params struct {
 }
 
 
-
 func handleMainPage(w http.ResponseWriter, r *http.Request) {
 
 	params := Params{
@@ -81,22 +80,10 @@ func confirm(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func dbPage(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
-    db, err := connectBigQueryDB(r)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-
-    c.Debugf("db: %v", db)
-}
-
-
 func init() {
 	http.HandleFunc("/map", handleMapPage)
 	http.HandleFunc("/send", confirm)
 	http.HandleFunc("/setup", setup)
-    http.HandleFunc("/db", dbPage)
+    http.HandleFunc("/reduce", reducePage)
 	http.HandleFunc("/", handleMainPage)
 }

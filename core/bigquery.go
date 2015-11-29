@@ -3,7 +3,7 @@ package core
 import (
 	"container/list"
 	"net/http"
-	//"fmt"
+	"errors"
     "golang.org/x/net/context"
     "golang.org/x/oauth2"
     "golang.org/x/oauth2/google"
@@ -17,8 +17,9 @@ import (
 
 const (
 	BIGQUERY_PROJECT = "cometiphrd"
-	BIGQUERY_DATASET = "appstore"
-	BIGQUERY_TABLE = "data"
+	BIGQUERY_DATASET = "october"//"appstore"
+	BIGQUERY_TABLE_DATA = "data"
+	BIGQUERY_TABLE_PROCEED = "apps_proceed"
 )
 
 
@@ -38,7 +39,7 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
 
 	service, err := bigquery.New(client)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	return &bqDataset{
@@ -55,11 +56,12 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
 		jobsets: make(map[string]*list.List),
 	}, nil
 }
-/*
-func (ds *bqDataset) Insert(request *AppRequest) error {
-  	rows := make([]*bigquery.TableDataInsertAllRequestRows, request.size())
+
+
+func (ds *bqDataset) Search(apps *[]Ap) error {
+  	rows := make([]*bigquery.TableDataInsertAllRequestRows, len(*apps))
  
-    for i, app := range request.Results {
+    for i, app := range *apps {
     	rows[i] = new(bigquery.TableDataInsertAllRequestRows)
     	Json, err := app.getJson()
     	if err != nil {
@@ -73,9 +75,31 @@ func (ds *bqDataset) Insert(request *AppRequest) error {
     _, err := ds.bq.Tabledata.InsertAll(ds.ProjectId, ds.DatasetId, ds.TableId, insertRequest).Do()
 	return err
 }
-*/
 
-func connectBigQueryDB(r *http.Request) (*bqDataset, error) {
+
+func (ds *bqDataset) Insert(apps *[]AppProceed) error {
+  	rows := make([]*bigquery.TableDataInsertAllRequestRows, len(*apps))
+ 
+    for i, app := range *apps {
+    	rows[i] = new(bigquery.TableDataInsertAllRequestRows)
+    	Json, err := app.getJson()
+    	if err != nil {
+    		return err
+    	}
+    	rows[i].Json = Json
+    }
+
+	insertRequest := &bigquery.TableDataInsertAllRequest{Rows: rows}
+	//fmt.Println(ds.ProjectId, ds.DatasetId, ds.TableId)
+    _, err := ds.bq.Tabledata.InsertAll(ds.ProjectId, ds.DatasetId, ds.TableId, insertRequest).Do()
+	return err
+}
+
+
+func connectBigQueryDB(r *http.Request, table string) (*bqDataset, error) {
+	if len(table) < nil {
+	    return nil, errors.New("BigQuery table name is not defined")
+	}
 
 	var ctx context.Context = newappengine.NewContext(r)
 
@@ -89,5 +113,5 @@ func connectBigQueryDB(r *http.Request) (*bqDataset, error) {
 	}
 	client := oauth2.NewClient(ctx, ts)
 
-	return newBQDataset(client, BIGQUERY_PROJECT, BIGQUERY_DATASET, BIGQUERY_TABLE)
+	return newBQDataset(client, BIGQUERY_PROJECT, BIGQUERY_DATASET, table)
 }
