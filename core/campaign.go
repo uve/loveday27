@@ -4,6 +4,7 @@ import (
 	"appengine"	
 	"appengine/datastore"
 	"time"
+	"net/http"
 )
 
 const (
@@ -16,14 +17,19 @@ type Campaign struct {
 	Created  time.Time
 }
 
+type CampaignParams struct {
+	Name  string
+	Limit  int
+}
 
-func getCampaignByType(c appengine.Context, name string) (*datastore.Key, error) {
+//func getCampaignByType(c appengine.Context, name string) (*datastore.Key, error) {
+func getCampaignByType(c appengine.Context, name string) (*Campaign, error) {
 	key := datastore.NewKey(c, DATASTORE_CAMPAIGN, name, 0, nil)
 	e := new(Campaign)
 	if err := datastore.Get(c, key, e); err != nil {
 		return nil, err
 	}
-	return key, nil
+	return e, nil
 }
 
 
@@ -61,6 +67,39 @@ func createAllCampaign(c appengine.Context) (error) {
     return err
 }
 
+
 func (campaign *Campaign) String() string {
     return campaign.Name
+}
+
+
+func (campaign *Campaign) createCampaignParams() (*CampaignParams) {
+
+	params := &CampaignParams{
+		Name: "Param1",
+	}
+
+    return params
+}
+
+
+func (campaign *Campaign) searchNewApps(r *http.Request) (*[]App, error) {
+    c := appengine.NewContext(r)
+	c.Debugf("Searching new apps")
+
+    db, err := connectBigQueryDB(r, BIGQUERY_TABLE_DATA)
+    if err != nil {
+        return nil, err
+    }
+
+    c.Debugf("db", db)
+
+    params := campaign.createCampaignParams()
+
+    apps, err := db.Search(params)
+    if err != nil {
+        return nil, err
+    }
+
+    return apps, nil
 }

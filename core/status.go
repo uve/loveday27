@@ -60,13 +60,13 @@ func createAllStatusTypes(c appengine.Context) (error) {
 	var values []*Status
 
 	for _, value := range names {
-    		status := &Status{
-		        Name: value,
-		        Created: time.Now(),
-		    }
-	    	key := datastore.NewKey(c, DATASTORE_STATUS, value, 0, nil)
-	    	keys = append(keys, key)
-	    	values = append(values, status)
+		status := &Status{
+	        Name: value,
+	        Created: time.Now(),
+	    }
+    	key := datastore.NewKey(c, DATASTORE_STATUS, value, 0, nil)
+    	keys = append(keys, key)
+    	values = append(values, status)
 	}
 
     _, err := datastore.PutMulti(c, keys, values)

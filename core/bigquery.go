@@ -11,8 +11,12 @@ import (
 	newappengine "google.golang.org/appengine"
     //newurlfetch "google.golang.org/appengine/urlfetch"
 
-	//"encoding/json"
+	"encoding/json"
 	//"appengine"
+    //"fmt"
+    //"strconv"
+
+    "github.com/SeanDolphin/bqschema"
 )
 
 const (
@@ -57,9 +61,8 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
 	}, nil
 }
 
-
-func (ds *bqDataset) Search(apps *[]Ap) error {
-  	rows := make([]*bigquery.TableDataInsertAllRequestRows, len(*apps))
+func (ds *bqDataset) Search(params *CampaignParams) (*[]App, error) {
+  	/*rows := make([]*bigquery.TableDataInsertAllRequestRows, len(*apps))
  
     for i, app := range *apps {
     	rows[i] = new(bigquery.TableDataInsertAllRequestRows)
@@ -72,8 +75,138 @@ func (ds *bqDataset) Search(apps *[]Ap) error {
 
 	insertRequest := &bigquery.TableDataInsertAllRequest{Rows: rows}
 	//fmt.Println(ds.ProjectId, ds.DatasetId, ds.TableId)
-    _, err := ds.bq.Tabledata.InsertAll(ds.ProjectId, ds.DatasetId, ds.TableId, insertRequest).Do()
-	return err
+    _, err := ds.bq.Tabledata.InsertAll(ds.ProjectId, ds.DatasetId, ds.TableId, insertRequest).Do()*/
+
+    // prepare the list of ids.
+   /* var ids []string
+    var appID = BIGQUERY_PROJECT
+    datasets, err := ds.Datasets.List(appID).Do()
+    if err != nil {
+        return nil, fmt.Errorf("could not list datasets for %q: %v", appID, err)
+    }
+    for _, d := range datasets.Datasets {
+        ids = append(ids, d.Id)
+    }
+    return ids, nil
+*/
+    //query := `SELECT data.trackId trackId, data.trackName trackName, data.sellerUrl sellerUrl, data.trackViewUrl trackViewUrl FROM [appstore.data] data
+    query := `SELECT 
+                    artistId,
+                    artistName,
+                    artistViewUrl,
+                    artworkUrl100,
+                    artworkUrl512,
+                    artworkUrl60,
+                    averageUserRating,
+                    averageUserRatingForCurrentVersion,
+                    bundleId,
+                    contentAdvisoryRating,
+                    currency,
+                    description,
+                    /*features,*/
+                    fileSizeBytes,
+                    formattedPrice,
+                    /*genreIds,
+                    genres,
+                    ipadScreenshotUrls,*/
+                    isGameCenterEnabled,
+                    kind,
+                    /*languageCodesISO2A,*/
+                    minimumOsVersion,
+                    price,
+                    primaryGenreId,
+                    primaryGenreName,
+                    releaseDate,
+                    releaseNotes,
+                    /*screenshotUrls,*/
+                    sellerName,
+                    sellerUrl,
+                    /*supportedDevices,*/
+                    trackCensoredName,
+                    trackContentRating,
+                    trackId,
+                    trackName,
+                    trackViewUrl,
+                    userRatingCount,
+                    userRatingCountForCurrentVersion,
+                    version,
+                    wrapperType
+                    
+                    FROM                            
+                           /// FLATTEN(
+                                [appstore.data]
+                          //  , LanguageCodesISO2A)
+                             as data
+            /// LEFT JOIN (SELECT proceed.TrackId TrackId, proceed.Campaign Campaign FROM [october.tracks_proceed] proceed 
+            // WHERE Campaign = 'CAMPAIGN_LOCALIZATION') as proceed
+            // on data.trackId = proceed.TrackId
+              WHERE TrackId NOT IN (SELECT TrackId FROM [october.tracks_proceed] proceed 
+             WHERE Campaign = 'CAMPAIGN_LOCALIZATION')
+            ORDER BY TrackId LIMIT 5`
+
+    queryRequest := &bigquery.QueryRequest{
+        //DefaultDataset: datasetRef,
+        Query: query,
+        MaxResults:     5,//int64(max),
+        Kind:           "json",
+        //Kind: "igquery#queryRequest",
+        //TimeoutMs:      100000000,//defaultTimeOutMs,
+    }
+
+    jobsService := bigquery.NewJobsService(ds.bq)
+    queryResponse, err := jobsService.Query(BIGQUERY_PROJECT, queryRequest).Do()
+    if err != nil {
+        return nil, err
+    }
+  
+    var apps []App
+    err = bqschema.ToStructs(queryResponse, &apps)
+    if err != nil {
+        return nil, err
+    }
+    return &apps, nil
+    /*
+    count := strconv.Itoa(len(apps))
+
+    ids = append(ids, "c")
+    ids = append(ids, count)
+    ids = append(ids, strconv.Itoa(apps[0].TrackId))
+    ids = append(ids, strconv.Itoa(apps[1].TrackId))
+    ids = append(ids, strconv.Itoa(apps[2].TrackId))
+    ids = append(ids, strconv.Itoa(apps[3].TrackId))
+    ids = append(ids, strconv.Itoa(apps[4].TrackId))
+/*
+    b, err := json.Marshal(apps[1])
+    if err != nil {
+        return nil, err
+    }
+    ids = append(ids, string(b))
+
+    return ids, nil
+    */
+}
+
+
+func getString(row *bigquery.TableRow) (string, error) {
+    b, err := json.Marshal(row)
+    if err != nil {
+        return "", err
+    }
+    return string(b), err
+}
+
+func getJson(row *bigquery.TableRow) (*App, error) {
+    b, err := json.Marshal(row)
+    if err != nil {
+        return nil, err
+    }
+
+    var app *App
+    err = json.Unmarshal(b, &app)
+    if err != nil {
+        return nil, err
+    }
+    return app, nil
 }
 
 
@@ -97,7 +230,7 @@ func (ds *bqDataset) Insert(apps *[]AppProceed) error {
 
 
 func connectBigQueryDB(r *http.Request, table string) (*bqDataset, error) {
-	if len(table) < nil {
+	if len(table) < 0 {
 	    return nil, errors.New("BigQuery table name is not defined")
 	}
 

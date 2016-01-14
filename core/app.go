@@ -2,49 +2,67 @@ package core
 
 import (
     "time"
+	"encoding/json"
+
+	bigquery "google.golang.org/api/bigquery/v2"
 )
 
 type App struct {
-	Advisories []string `json:"advisories"`
-	ArtistId int `json:"artistId"`
-	ArtistName string `json:"artistName"`
-	ArtistViewUrl string `json:"artistViewUrl"`
-	ArtworkUrl100 string `json:"artworkUrl100"`
-	ArtworkUrl512 string `json:"artworkUrl512"`
-	ArtworkUrl60 string `json:"artworkUrl60"`
-	AverageUserRating float32 `json:"averageUserRating"`
-	AverageUserRatingForCurrentVersion float32 `json:"averageUserRatingForCurrentVersion"`
-	BundleId string `json:"bundleId"`
-	ContentAdvisoryRating string `json:"contentAdvisoryRating"`
-	Currency string `json:"currency"`
-	Description string `json:"description"`
-	Features []string `json:"features"`
-	FileSizeBytes string `json:"fileSizeBytes"`
-	FormattedPrice string `json:"formattedPrice"`
-	GenreIds []string `json:"genreIds"`
-	Genres []string `json:"genres"`
-	IpadScreenshotUrls []string `json:"ipadScreenshotUrls"`
-	IsGameCenterEnabled bool `json:"isGameCenterEnabled"`
+	Advisories []string
+	ArtistId int
+	ArtistName string
+	ArtistViewUrl string
+	ArtworkUrl100 string
+	ArtworkUrl512 string
+	ArtworkUrl60 string
+	AverageUserRating float32
+	AverageUserRatingForCurrentVersion float32
+	BundleId string
+	ContentAdvisoryRating string
+	Currency string
+	Description string
+	Features []string
+	FileSizeBytes string
+	FormattedPrice string
+	GenreIds []string
+	Genres []string
+	IpadScreenshotUrls []string
+	IsGameCenterEnabled bool
 	//IsVppDeviceBasedLicensingEnabled bool `json:"isVppDeviceBasedLicensingEnabled"`
-	Kind string `json:"kind"`
-	LanguageCodesISO2A []string `json:"languageCodesISO2A"`
-	MinimumOsVersion string `json:"minimumOsVersion"`
-	Price float32 `json:"price"`
-	PrimaryGenreId int `json:"primaryGenreId"`
-	PrimaryGenreName string `json:"primaryGenreName"`
-	ReleaseDate time.Time `json:"releaseDate"`
-	ReleaseNotes string `json:"releaseNotes"`
-	ScreenshotUrls []string `json:"screenshotUrls"`
-	SellerName string `json:"sellerName"`
-	SellerUrl string `json:"sellerUrl"`
-	SupportedDevices []string `json:"supportedDevices"`
-	TrackCensoredName string `json:"trackCensoredName"`
-	TrackContentRating string `json:"trackContentRating"`
-	TrackId int `json:"trackId"`
-	TrackName string `json:"trackName"`
-	TrackViewUrl string `json:"trackViewUrl"`
-	UserRatingCount int `json:"userRatingCount"`
-	UserRatingCountForCurrentVersion int `json:"userRatingCountForCurrentVersion"`
-	Version string `json:"version"`
-	WrapperType string `json:"wrapperType"`
+	Kind string
+	LanguageCodesISO2A []string
+	MinimumOsVersion string
+	Price float32
+	PrimaryGenreId int
+	PrimaryGenreName string
+	ReleaseDate time.Time
+	ReleaseNotes string
+	ScreenshotUrls []string
+	SellerName string
+	SellerUrl string
+	SupportedDevices []string
+	TrackCensoredName string
+	TrackContentRating string
+	TrackId int
+	TrackName string
+	TrackViewUrl string
+	UserRatingCount float32
+	UserRatingCountForCurrentVersion float32
+	Version string
+	WrapperType string
 }
+
+func (app *App) getJson() (map[string]bigquery.JsonValue, error) {
+	b, err := json.Marshal(app)
+    if err != nil {
+        return nil, err
+    }
+
+    var Json map[string]bigquery.JsonValue
+	err = json.Unmarshal(b, &Json)
+    if err != nil {
+        return nil, err
+    }
+	return Json, nil
+}
+

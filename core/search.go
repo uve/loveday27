@@ -16,18 +16,31 @@ type AppProceed struct {
 }
 
 
-func reducePage(w http.ResponseWriter, r *http.Request) {
+func searchPage(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    c.Debugf("search Page")
 
-    apps, err := searchApps(r)
+    campaign, err := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 
-    apps.save()
+    c.Debugf("campaign: ", campaign)
 
-    appProceed := apps.proceed()
+    apps, err := campaign.searchNewApps(r)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    for _, app := range *apps {
+        c.Debugf("app TrackId: ", app.TrackId)
+        c.Debugf("app TrackName: ", app.TrackName)
+    }
+    //apps.save()
+
+    //appProceed := apps.proceed()
     //appProceed.save()
 /*
     var apps []AppProceed
@@ -40,22 +53,7 @@ func reducePage(w http.ResponseWriter, r *http.Request) {
 */
 }
 
-func searchApps(r *http.Request) (*[]App, error) {
-	c.Debugf("Searching new apps")
-
-    db, err := connectBigQueryDB(r, BIGQUERY_TABLE_DATA)
-    if err != nil {
-        return nil, err
-    }
-    apps, err := db.Search(&apps)
-    if err != nil {
-        return nil, err
-    }
-
-    return apps, nil
-}
-
-
+/*
 
 func (apps *[]App) proceed() ([]AppProceed, error) {
 	c.Debugf("Saving %d apps to AppEngine", len(*apps))
@@ -66,9 +64,8 @@ func (apps *[]App) proceed() ([]AppProceed, error) {
         items[i].Campaign = CAMPAIGN_LOCALIZATION
     }
     return items
-}
-
-
+}*/
+/*
 func (apps *[]App) save() (error) {
 	c.Debugf("Saving %d apps to AppEngine", len(*apps))
 
@@ -90,7 +87,7 @@ func (apps *[]AppProceed) save(r *http.Request) (error) {
 
     return nil
 }
-
+*/
 
 func (app *AppProceed) getJson() (map[string]bigquery.JsonValue, error) {
 	b, err := json.Marshal(app)
