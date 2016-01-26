@@ -7,13 +7,13 @@ import (
 
 // Score is an entity to store campaign
 type Email struct {
-	Name  string
+	Name    string
 	Content string `datastore:",noindex"`
 
-	Status *datastore.Key
+	Status   *datastore.Key
 	Campaign *datastore.Key
 	Created  time.Time
-	Modified  time.Time
+	Modified time.Time
 }
 
 /*

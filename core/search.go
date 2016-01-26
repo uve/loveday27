@@ -9,48 +9,72 @@ import (
 	"encoding/json"
 )
 
-
-type AppProceed struct {
-	TrackId int
-	Campaign string
-}
-
-
 func searchPage(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
-    c.Debugf("search Page")
+	c := appengine.NewContext(r)
+	c.Debugf("search Page")
 
-    campaign, err := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
+	campaign, err := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	c.Debugf("Campaign: ", campaign)
+
+	err = campaign.searchNewApps(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+    c.Debugf("Found new apps: ", len(*(campaign.Apps)))
+    appsProceed, err := campaign.getProceed()
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 
-    c.Debugf("campaign: ", campaign)
-
-    apps, err := campaign.searchNewApps(r)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-
-    for _, app := range *apps {
+    for _, app := range *appsProceed {
         c.Debugf("app TrackId: ", app.TrackId)
-        c.Debugf("app TrackName: ", app.TrackName)
+        c.Debugf("app Campaign: ", app.Campaign)
+        c.Debugf("app Created: ", app.Created)
     }
-    //apps.save()
 
-    //appProceed := apps.proceed()
-    //appProceed.save()
+    err = campaign.save(r)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    c.Debugf("Compaign saved")
 /*
-    var apps []AppProceed
-
-    sample_app := AppProceed{
-    	TrackId: 281656475,
-    	Campaign: CAMPAIGN_LOCALIZATION,
+	for _, app := range *(campaign.Apps) {
+        c.Debugf("app TrackId: ", app.TrackId)
+        c.Debugf("app Description: ", app.Description)
+        c.Debugf("app LanguageCodesISO2A: ", app.LanguageCodesISO2A)
+	}
+    */
+    /*
+    err = campaign.saveNewApps(r)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
     }
-    apps = append(apps, sample_app)
-*/
+    */
+	//apps.save()
+
+	//appProceed := apps.proceed()
+	//appProceed.save()
+	/*
+	   var apps []AppProceed
+
+	   sample_app := AppProceed{
+	   	TrackId: 281656475,
+	   	Campaign: CAMPAIGN_LOCALIZATION,
+	   }
+	   apps = append(apps, sample_app)
+	*/
+
 }
 
 /*
@@ -91,15 +115,14 @@ func (apps *[]AppProceed) save(r *http.Request) (error) {
 
 func (app *AppProceed) getJson() (map[string]bigquery.JsonValue, error) {
 	b, err := json.Marshal(app)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    var Json map[string]bigquery.JsonValue
+	var Json map[string]bigquery.JsonValue
 	err = json.Unmarshal(b, &Json)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 	return Json, nil
 }
-

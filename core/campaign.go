@@ -1,28 +1,29 @@
 package core
 
 import (
-	"appengine"	
+	"appengine"
 	"appengine/datastore"
-	"time"
 	"net/http"
+	"time"
+	"errors"
 )
 
 const (
-	DATASTORE_CAMPAIGN      = "CAMPAIGN"
-    CAMPAIGN_LOCALIZATION   = "CAMPAIGN_LOCALIZATION"
+	DATASTORE_CAMPAIGN    = "CAMPAIGN"
+	CAMPAIGN_LOCALIZATION = "CAMPAIGN_LOCALIZATION"
 )
 
 type Campaign struct {
-	Name  string
-	Created  time.Time
+	Name    string
+	Created time.Time
+	Apps *[]App
 }
 
 type CampaignParams struct {
 	Name  string
-	Limit  int
+	Limit int
 }
 
-//func getCampaignByType(c appengine.Context, name string) (*datastore.Key, error) {
 func getCampaignByType(c appengine.Context, name string) (*Campaign, error) {
 	key := datastore.NewKey(c, DATASTORE_CAMPAIGN, name, 0, nil)
 	e := new(Campaign)
@@ -32,21 +33,19 @@ func getCampaignByType(c appengine.Context, name string) (*Campaign, error) {
 	return e, nil
 }
 
-
 func getCampaignCount(c appengine.Context) (int, error) {
 
 	q := datastore.NewQuery(DATASTORE_CAMPAIGN)
 
 	count, err := q.Count(c)
-	if err != nil {	
+	if err != nil {
 		return 0, err
 	}
 	return count, nil
 }
 
-
-func createAllCampaign(c appengine.Context) (error) {
-	names := [...]string { 
+func createAllCampaign(c appengine.Context) error {
+	names := [...]string{
 		CAMPAIGN_LOCALIZATION,
 	}
 
@@ -54,52 +53,93 @@ func createAllCampaign(c appengine.Context) (error) {
 	var values []*Campaign
 
 	for _, value := range names {
-    		status := &Campaign{
-		        Name: value,
-		        Created: time.Now(),
-		    }
-	    	key := datastore.NewKey(c, DATASTORE_CAMPAIGN, value, 0, nil)
-	    	keys = append(keys, key)
-	    	values = append(values, status)
+		status := &Campaign{
+			Name:    value,
+			Created: time.Now(),
+		}
+		key := datastore.NewKey(c, DATASTORE_CAMPAIGN, value, 0, nil)
+		keys = append(keys, key)
+		values = append(values, status)
 	}
 
-    _, err := datastore.PutMulti(c, keys, values)
-    return err
+	_, err := datastore.PutMulti(c, keys, values)
+	return err
 }
-
 
 func (campaign *Campaign) String() string {
-    return campaign.Name
+	return campaign.Name
 }
 
-
-func (campaign *Campaign) createCampaignParams() (*CampaignParams) {
+func (campaign *Campaign) createCampaignParams() *CampaignParams {
 
 	params := &CampaignParams{
 		Name: "Param1",
 	}
 
-    return params
+	return params
 }
 
+func (campaign *Campaign) searchNewApps(r *http.Request) (error) {
+	db, err := connectBigQueryDB(r, BIGQUERY_TABLE_DATA)
+	if err != nil {
+		return err
+	}
 
-func (campaign *Campaign) searchNewApps(r *http.Request) (*[]App, error) {
-    c := appengine.NewContext(r)
-	c.Debugf("Searching new apps")
+	params := campaign.createCampaignParams()
+	appsBuffer, err := db.Search(params)
+	if err != nil {
+		return err
+	}
 
-    db, err := connectBigQueryDB(r, BIGQUERY_TABLE_DATA)
-    if err != nil {
-        return nil, err
+    //с := appengine.NewContext(r)
+
+    apps := make([]App, len(*appsBuffer))
+    for i, appBuffer := range *appsBuffer {
+        apps[i] = appBuffer.toApp()
+        /*
+        с.Debugf("TrackId: ",     apps[i].TrackId)
+        с.Debugf("ReleaseDate: ", apps[i].ReleaseDate)
+        c.Debugf("SupportedDevices: ", items[i].SupportedDevices)
+        c.Debugf("ArtistName: ", items[i].ArtistName)
+        c.Debugf("Description: ", items[i].Description)
+        c.Debugf("LanguageCodesISO2A: ", items[i].LanguageCodesISO2A)
+        */
     }
 
-    c.Debugf("db", db)
+    campaign.Apps = &apps
 
-    params := campaign.createCampaignParams()
-
-    apps, err := db.Search(params)
-    if err != nil {
-        return nil, err
-    }
-
-    return apps, nil
+	return nil
 }
+
+func (campaign *Campaign) save(r *http.Request) (error) {
+	db, err := connectBigQueryDB(r, BIGQUERY_TABLE_PROCEED)
+	if err != nil {
+		return err
+	}
+
+    appsProceed, err := campaign.getProceed()
+    if err != nil {
+        return err
+    }
+
+    err = db.Insert(appsProceed)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+func (campaign *Campaign) getProceed() (*[]AppProceed, error) {
+	if campaign.Apps == nil {
+		return nil, errors.New("No apps to be proceed")
+	}
+
+    items := make([]AppProceed, len(*(campaign.Apps)))
+    for i, app := range *(campaign.Apps) {
+        items[i].TrackId = app.TrackId
+        items[i].Campaign = campaign.Name
+        items[i].Created = time.Now()
+    }
+    return &items, nil
+}
+

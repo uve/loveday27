@@ -1,54 +1,54 @@
 package core
 
 import (
-    "net/http"
+	"net/http"
 
-    "log"
-    "text/template"
-    "appengine"
+	"appengine"
+	"log"
+	"text/template"
 )
 
 func handleMapPage(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
-    c.Debugf("map Page")
+	c := appengine.NewContext(r)
+	c.Debugf("map Page")
 
-  /*
-    campaign, nil := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
-    campaign.getAppByStatus(APP_STATUS_)
-*/
-    params := Params{
-        //ClientId: config.Config.OAuthProviders.Google.ClientId,
-        ClientId: "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com",
-    }
+	/*
+	   campaign, nil := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
+	   campaign.getAppByStatus(APP_STATUS_)
+	*/
+	params := Params{
+		//ClientId: config.Config.OAuthProviders.Google.ClientId,
+		ClientId: "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com",
+	}
 
-    var index = template.Must(template.ParseFiles("templates/map.html"))
+	var index = template.Must(template.ParseFiles("templates/map.html"))
 
-    err := index.Execute(w, params)
-    if err != nil {
-        log.Fatalf("template execution: %s", err)
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
+	err := index.Execute(w, params)
+	if err != nil {
+		log.Fatalf("template execution: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 /*
-    apps, err := searchApps(r)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+   apps, err := searchApps(r)
+   if err != nil {
+       http.Error(w, err.Error(), http.StatusInternalServerError)
+       return
+   }
 */
-    //apps.save()
+//apps.save()
 
-    //appProceed := apps.proceed()
-    //appProceed.save()
+//appProceed := apps.proceed()
+//appProceed.save()
 /*
-    var apps []AppProceed
+   var apps []AppProceed
 
-    sample_app := AppProceed{
-        TrackId: 281656475,
-        Campaign: CAMPAIGN_LOCALIZATION,
-    }
-    apps = append(apps, sample_app)
+   sample_app := AppProceed{
+       TrackId: 281656475,
+       Campaign: CAMPAIGN_LOCALIZATION,
+   }
+   apps = append(apps, sample_app)
 */
 
 /*

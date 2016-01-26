@@ -1,23 +1,20 @@
 package core
 
 import (
-
 	"log"
 
 	"text/template"
 
- 	"fmt"
+	"fmt"
 	"net/http"
 
 	"appengine"
 	"appengine/mail"
 )
 
-
 type Params struct {
-	ClientId  string
+	ClientId string
 }
-
 
 func handleMainPage(w http.ResponseWriter, r *http.Request) {
 
@@ -28,10 +25,10 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 	var index = template.Must(template.ParseFiles("templates/index.html"))
 
 	err := index.Execute(w, params)
-    if err != nil {
-    	log.Fatalf("template execution: %s", err)
-    	http.Error(w, err.Error(), http.StatusInternalServerError)
-    }	
+	if err != nil {
+		log.Fatalf("template execution: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 const confirmMessage = `
@@ -42,29 +39,28 @@ Please confirm your email address by clicking on the link below:
 `
 
 func confirm(w http.ResponseWriter, r *http.Request) {
-        c := appengine.NewContext(r)
-        //addr := r.FormValue("email")
-        //url := createConfirmationURL(r)
+	c := appengine.NewContext(r)
+	//addr := r.FormValue("email")
+	//url := createConfirmationURL(r)
 
-		addrs := []string{"check-auth@verifier.port25.com"}//, "nikita.grachev@gmail.com"}
-		url := "mindale.com"
+	addrs := []string{"check-auth@verifier.port25.com"} //, "nikita.grachev@gmail.com"}
+	url := "mindale.com"
 
-        msg := &mail.Message{
-                Sender:  "Mindale Localization Services <mail@mindale.com>",
-                To:      addrs,
-                Subject: "Confirm your registration",
-                Body:    fmt.Sprintf(confirmMessage, url),
-        }
-        if err := mail.Send(c, msg); err != nil {
-                c.Errorf("Couldn't send email: %v", err)
-        }
+	msg := &mail.Message{
+		Sender:  "Mindale Localization Services <mail@mindale.com>",
+		To:      addrs,
+		Subject: "Confirm your registration",
+		Body:    fmt.Sprintf(confirmMessage, url),
+	}
+	if err := mail.Send(c, msg); err != nil {
+		c.Errorf("Couldn't send email: %v", err)
+	}
 }
-
 
 func init() {
 	http.HandleFunc("/map", handleMapPage)
 	http.HandleFunc("/send", confirm)
 	http.HandleFunc("/setup", setup)
-    http.HandleFunc("/search", searchPage)
+	http.HandleFunc("/search", searchPage)
 	http.HandleFunc("/", handleMainPage)
 }
