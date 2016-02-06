@@ -12,6 +12,12 @@ import (
 	"appengine/mail"
 )
 
+const (
+   mailSenderName = "Daria"
+   mailSenderAddress = "daria@localization.expert"
+   mailDomain = "localization.expert"
+)
+
 type Params struct {
 	ClientId string
 }
@@ -37,20 +43,20 @@ Please confirm your email address by clicking on the link below:
 
 %s
 `
+const templateMailFrom = "%s <%s>"
 
 func confirm(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	//addr := r.FormValue("email")
 	//url := createConfirmationURL(r)
 
-	addrs := []string{"check-auth@verifier.port25.com"} //, "nikita.grachev@gmail.com"}
-	url := "mindale.com"
+	addrs := []string{"check-auth@verifier.port25.com", /*"nikita.grachev@gmail.com"*/}
 
 	msg := &mail.Message{
-		Sender:  "Mindale Localization Services <mail@mindale.com>",
+		Sender:  fmt.Sprintf(templateMailFrom, mailSenderName, mailSenderAddress),
 		To:      addrs,
 		Subject: "Confirm your registration",
-		Body:    fmt.Sprintf(confirmMessage, url),
+		Body:    fmt.Sprintf(confirmMessage, mailDomain),
 	}
 	if err := mail.Send(c, msg); err != nil {
 		c.Errorf("Couldn't send email: %v", err)
