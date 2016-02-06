@@ -13,7 +13,7 @@ func searchPage(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	c.Debugf("search Page")
 
-	campaign, err := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
+	campaign, _, err := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -26,7 +26,7 @@ func searchPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+/*
     c.Debugf("Found new apps: ", len(*(campaign.Apps)))
     appsProceed, err := campaign.getProceed()
     if err != nil {
@@ -39,7 +39,7 @@ func searchPage(w http.ResponseWriter, r *http.Request) {
         c.Debugf("app Campaign: ", app.Campaign)
         c.Debugf("app Created: ", app.Created)
     }
-
+*/
     err = campaign.save(r)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -47,34 +47,6 @@ func searchPage(w http.ResponseWriter, r *http.Request) {
     }
 
     c.Debugf("Compaign saved")
-/*
-	for _, app := range *(campaign.Apps) {
-        c.Debugf("app TrackId: ", app.TrackId)
-        c.Debugf("app Description: ", app.Description)
-        c.Debugf("app LanguageCodesISO2A: ", app.LanguageCodesISO2A)
-	}
-    */
-    /*
-    err = campaign.saveNewApps(r)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    */
-	//apps.save()
-
-	//appProceed := apps.proceed()
-	//appProceed.save()
-	/*
-	   var apps []AppProceed
-
-	   sample_app := AppProceed{
-	   	TrackId: 281656475,
-	   	Campaign: CAMPAIGN_LOCALIZATION,
-	   }
-	   apps = append(apps, sample_app)
-	*/
-
 }
 
 /*

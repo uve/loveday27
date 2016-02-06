@@ -8,6 +8,10 @@ import (
 	bigquery "google.golang.org/api/bigquery/v2"
 )
 
+const (
+	APP_DESCRIPTION_MAX_LENGTH = 1500
+)
+
 type AppProceed struct {
 	TrackId  int
 	Campaign string
@@ -29,6 +33,11 @@ func (appBuffer *AppBuffer) toApp() (App) {
 	app.ContentAdvisoryRating = appBuffer.ContentAdvisoryRating
 	app.Currency = appBuffer.Currency
 	app.Description = appBuffer.Description
+
+	if len(app.Description) > APP_DESCRIPTION_MAX_LENGTH {
+		app.Description = app.Description[0:APP_DESCRIPTION_MAX_LENGTH]
+	}
+
 	app.FileSizeBytes = appBuffer.FileSizeBytes
 	app.FormattedPrice = appBuffer.FormattedPrice
 	app.IsGameCenterEnabled = appBuffer.IsGameCenterEnabled
@@ -164,7 +173,7 @@ type App struct {
 	WrapperType                      string
 
 	Created                          time.Time
-	Campaign           string
+	//Campaign           string
 }
 
 func (app *App) getJson() (map[string]bigquery.JsonValue, error) {

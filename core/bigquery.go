@@ -153,8 +153,7 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
                     Campaign
             HAVING LangsCount > 0
                   AND Campaign IS NULL
-            ORDER BY LangsCount ASC,
-                     ReleaseDate DESC
+            ORDER BY LangsCount ASC
             LIMIT {{.LIMIT}}`
 
 func (ds *bqDataset) Search(params *CampaignParams) (*[]AppBuffer, error) {

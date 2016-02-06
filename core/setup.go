@@ -60,12 +60,12 @@ func setupCampaign(c appengine.Context) error {
 
 	c.Debugf("Created campaign count: %d", count)
 
-	key, err := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
+	campaign, _, err := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
 	if err != nil {
 		return err
 	}
 
-	c.Debugf("CAMPAIGN_LOCALIZATION key: %v", key)
+	c.Debugf("CAMPAIGN_LOCALIZATION key: %v", campaign)
 
 	return nil
 }

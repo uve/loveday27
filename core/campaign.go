@@ -6,9 +6,14 @@ import (
 	"net/http"
 	"time"
 	"errors"
+    "strconv"
+    "strings"
 )
 
 const (
+    DATASTORE_APP = "APP"
+    DATASTORE_STORE = "APPSTORE"
+    DATASTORE_TICKET = "TICKET"
 	DATASTORE_CAMPAIGN    = "CAMPAIGN"
 	CAMPAIGN_LOCALIZATION = "CAMPAIGN_LOCALIZATION"
 )
@@ -17,6 +22,7 @@ type Campaign struct {
 	Name    string
 	Created time.Time
 	Apps *[]App
+    Keys []*datastore.Key
 }
 
 type CampaignParams struct {
@@ -24,13 +30,13 @@ type CampaignParams struct {
 	Limit int
 }
 
-func getCampaignByType(c appengine.Context, name string) (*Campaign, error) {
+func getCampaignByType(c appengine.Context, name string) (*Campaign, *datastore.Key, error) {
 	key := datastore.NewKey(c, DATASTORE_CAMPAIGN, name, 0, nil)
 	e := new(Campaign)
 	if err := datastore.Get(c, key, e); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return e, nil
+	return e, key, nil
 }
 
 func getCampaignCount(c appengine.Context) (int, error) {
@@ -112,10 +118,50 @@ func (campaign *Campaign) searchNewApps(r *http.Request) (error) {
 }
 
 func (campaign *Campaign) save(r *http.Request) (error) {
-	db, err := connectBigQueryDB(r, BIGQUERY_TABLE_PROCEED)
-	if err != nil {
-		return err
-	}
+    var err error
+    err = campaign.saveApps(r)
+    if err != nil {
+        return err
+    }
+
+    err = campaign.saveProceed(r)
+    if err != nil {
+        return err
+    }
+
+    err = campaign.saveTickets(r)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+
+func (campaign *Campaign) saveApps(r *http.Request) (error) {
+    c := appengine.NewContext(r)
+
+    keys := make([]*datastore.Key, len(*campaign.Apps))
+
+    for i, app := range *campaign.Apps {
+        key_name := []string{ DATASTORE_APP,
+                              DATASTORE_STORE,
+                              strconv.Itoa(app.TrackId),
+                            }
+        keys[i] = datastore.NewKey(c, DATASTORE_APP, strings.Join(key_name, "_"), 0, nil)
+    }
+
+    _, err := datastore.PutMulti(c, keys, *campaign.Apps)
+
+    campaign.Keys = keys
+    return err
+}
+
+
+func (campaign *Campaign) saveProceed(r *http.Request) (error) {
+    db, err := connectBigQueryDB(r, BIGQUERY_TABLE_PROCEED)
+    if err != nil {
+        return err
+    }
 
     appsProceed, err := campaign.getProceed()
     if err != nil {
@@ -141,5 +187,46 @@ func (campaign *Campaign) getProceed() (*[]AppProceed, error) {
         items[i].Created = time.Now()
     }
     return &items, nil
+}
+
+
+func (campaign *Campaign) saveTickets(r *http.Request) (error) {
+    c := appengine.NewContext(r)
+
+    _, сompaignKey, err := getCampaignByType(c, campaign.Name)
+    if err != nil {
+        return err
+    }
+
+    statusKey, err := getStatusByType(c, STATUS_NEW_APP)
+    if err != nil {
+        return err
+    }
+
+    keys := make([]*datastore.Key, len(*campaign.Apps))
+    tickets := make([]Ticket, len(*campaign.Apps))
+
+    for i, app := range *campaign.Apps {
+        key_name := []string{ 
+                              DATASTORE_TICKET,
+                              campaign.Name,
+                              DATASTORE_STORE,
+                              strconv.Itoa(app.TrackId),
+                            }
+        keys[i] = datastore.NewKey(c, DATASTORE_TICKET, strings.Join(key_name, "_"), 0, nil)
+
+        ticket := &Ticket{
+            App: campaign.Keys[i],
+            Compaign: сompaignKey,
+            Status: statusKey,
+            Created: time.Now(),
+            Modified: time.Now(),
+        }
+        tickets[i] = *ticket
+    }
+
+    _, err = datastore.PutMulti(c, keys, tickets)
+
+    return err
 }
 
