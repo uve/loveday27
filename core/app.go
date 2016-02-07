@@ -5,6 +5,9 @@ import (
 	"time"
 	"strings"
 
+   "appengine"
+   "appengine/datastore"
+
 	bigquery "google.golang.org/api/bigquery/v2"
 )
 
@@ -74,7 +77,7 @@ func (appBuffer *AppBuffer) toApp() (App) {
 	app.SupportedDevices   = strings.Split(appBuffer.SupportedDevices, ",")
 
 	app.Created = time.Now()
-	
+
 	return app
 }
 
@@ -188,4 +191,12 @@ func (app *App) getJson() (map[string]bigquery.JsonValue, error) {
 		return nil, err
 	}
 	return Json, nil
+}
+
+func getApp(c appengine.Context, appKey *datastore.Key)	(*App, error) {
+   var app App
+   if err := datastore.Get(c, appKey, &app); err != nil {
+		return nil, err
+	}
+	return &app, nil
 }

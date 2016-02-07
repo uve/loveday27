@@ -1,4 +1,7 @@
 cron:
+- description: Search new app from BigQuery
+  url: /search
+  schedule: every 10 minutes
 #- description: daily email job
 #  url: /send
 #  schedule: every 10 minutes

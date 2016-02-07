@@ -15,3 +15,8 @@ indexes:
   - name: Name
   - name: Created
     direction: desc
+
+- kind: TICKET
+  properties:
+  - name: Status
+  - name: Modified

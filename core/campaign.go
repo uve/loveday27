@@ -13,16 +13,15 @@ import (
 const (
     DATASTORE_APP = "APP"
     DATASTORE_STORE = "APPSTORE"
-    DATASTORE_TICKET = "TICKET"
-	DATASTORE_CAMPAIGN    = "CAMPAIGN"
-	CAMPAIGN_LOCALIZATION = "CAMPAIGN_LOCALIZATION"
+	 DATASTORE_CAMPAIGN    = "CAMPAIGN"
+	 CAMPAIGN_LOCALIZATION = "CAMPAIGN_LOCALIZATION"
 )
 
 type Campaign struct {
 	Name    string
 	Created time.Time
-	Apps *[]App
-    Keys []*datastore.Key
+	Apps *[]App `datastore:"-"`
+   Keys []*datastore.Key `datastore:"-"`
 }
 
 type CampaignParams struct {
@@ -97,14 +96,14 @@ func (campaign *Campaign) searchNewApps(r *http.Request) (error) {
 		return err
 	}
 
-    //с := appengine.NewContext(r)
+    с := appengine.NewContext(r)
 
     apps := make([]App, len(*appsBuffer))
     for i, appBuffer := range *appsBuffer {
         apps[i] = appBuffer.toApp()
-        /*
+
         с.Debugf("TrackId: ",     apps[i].TrackId)
-        с.Debugf("ReleaseDate: ", apps[i].ReleaseDate)
+        /*с.Debugf("ReleaseDate: ", apps[i].ReleaseDate)
         c.Debugf("SupportedDevices: ", items[i].SupportedDevices)
         c.Debugf("ArtistName: ", items[i].ArtistName)
         c.Debugf("Description: ", items[i].Description)
@@ -207,7 +206,7 @@ func (campaign *Campaign) saveTickets(r *http.Request) (error) {
     tickets := make([]Ticket, len(*campaign.Apps))
 
     for i, app := range *campaign.Apps {
-        key_name := []string{ 
+        key_name := []string{
                               DATASTORE_TICKET,
                               campaign.Name,
                               DATASTORE_STORE,

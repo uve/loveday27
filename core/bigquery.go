@@ -27,8 +27,8 @@ const (
 	BIGQUERY_PROJECT       = "cometiphrd"
 	BIGQUERY_DATASET       = "appstore"
 	BIGQUERY_TABLE_DATA    = "data"
-	BIGQUERY_TABLE_PROCEED = "apps_proceed2"
-    BIGQUERY_QUERY_LIMIT   = 5
+	BIGQUERY_TABLE_PROCEED = "apps_proceed"
+   BIGQUERY_QUERY_LIMIT   = 5
 )
 
 // Wraps the BigQuery service and dataset and provides some helper functions.
@@ -64,7 +64,7 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
 	}, nil
 }
 
-    const queryNewAppsTmpl = `SELECT                    
+    const queryNewAppsTmpl = `SELECT
 
                     FIRST(data.trackId) TrackId,
 
@@ -80,7 +80,7 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
                     GROUP_CONCAT(data.languageCodesISO2A, ",") LanguageCodesISO2A,
                     GROUP_CONCAT(data.screenshotUrls, ",") ScreenshotUrls,
                     GROUP_CONCAT(data.supportedDevices, ",") SupportedDevices,
-                    
+
                     data.artistId ArtistId,
                     data.artistName ArtistName,
                     data.artistViewUrl ArtistViewUrl,
@@ -106,7 +106,7 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
                     data.sellerUrl SellerUrl,
                     data.trackCensoredName TrackCensoredName,
                     data.trackContentRating TrackContentRating,
-                    
+
                     data.trackName TrackName,
                     data.trackViewUrl TrackViewUrl,
                     data.userRatingCount UserRatingCount,
@@ -157,7 +157,7 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
             LIMIT {{.LIMIT}}`
 
 func (ds *bqDataset) Search(params *CampaignParams) (*[]AppBuffer, error) {
-	
+
     data := map[string]interface{}{
         "LIMIT":         BIGQUERY_QUERY_LIMIT,
         "DATASET":       BIGQUERY_DATASET,

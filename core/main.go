@@ -13,8 +13,8 @@ import (
 )
 
 const (
-   mailSenderName = "Daria"
-   mailSenderAddress = "daria@localization.expert"
+   mailSenderName = "Anna Berry"
+   mailSenderAddress = "anna@localization.expert"
    mailDomain = "localization.expert"
 )
 
@@ -38,10 +38,16 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 }
 
 const confirmMessage = `
+Hi,
+ This is Anna Berry, I'm localization manager
+It's my first message!!!
 Thank you for creating an account!
-Please confirm your email address by clicking on the link below:
 
 %s
+
+
+Best Regards,
+Anna Berry
 `
 const templateMailFrom = "%s <%s>"
 
@@ -49,8 +55,9 @@ func confirm(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	//addr := r.FormValue("email")
 	//url := createConfirmationURL(r)
+   c.Infof("Sender:", fmt.Sprintf(templateMailFrom, mailSenderName, mailSenderAddress))
 
-	addrs := []string{"check-auth@verifier.port25.com", /*"nikita.grachev@gmail.com"*/}
+	addrs := []string{"check-auth@verifier.port25.com", "nikita.grachev@gmail.com", "daria.esaulova@gmail.com"}
 
 	msg := &mail.Message{
 		Sender:  fmt.Sprintf(templateMailFrom, mailSenderName, mailSenderAddress),
@@ -68,5 +75,6 @@ func init() {
 	http.HandleFunc("/send", confirm)
 	http.HandleFunc("/setup", setup)
 	http.HandleFunc("/search", searchPage)
+	http.HandleFunc("/parser", parserPage)
 	http.HandleFunc("/", handleMainPage)
 }

@@ -53,6 +53,8 @@ func setupCampaign(c appengine.Context) error {
 		return err
 	}
 
+   c.Debugf("Created campaigns")
+
 	count, err := getCampaignCount(c)
 	if err != nil {
 		return err
