@@ -15,6 +15,7 @@ func searchPage(w http.ResponseWriter, r *http.Request) {
 
 	campaign, _, err := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
 	if err != nil {
+      c.Debugf("Error: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -23,6 +24,7 @@ func searchPage(w http.ResponseWriter, r *http.Request) {
 
 	err = campaign.searchNewApps(r)
 	if err != nil {
+      c.Debugf("Error: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -40,8 +42,11 @@ func searchPage(w http.ResponseWriter, r *http.Request) {
         c.Debugf("app Created: ", app.Created)
     }
 */
+    c.Debugf("Campaign save")
+
     err = campaign.save(r)
     if err != nil {
+        c.Debugf("Error: ", err)
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }

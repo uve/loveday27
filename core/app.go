@@ -12,6 +12,7 @@ import (
 )
 
 const (
+   DATASTORE_APP = "App"
 	APP_DESCRIPTION_MAX_LENGTH = 1500
 )
 

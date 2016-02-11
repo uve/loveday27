@@ -6,13 +6,18 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+   //"golang.org/x/oauth2/internal"
+
 	bigquery "google.golang.org/api/bigquery/v2"
 	newappengine "google.golang.org/appengine"
+
+   //"appengine/urlfetch"
+
 	"net/http"
-	//newurlfetch "google.golang.org/appengine/urlfetch"
 
 	"encoding/json"
 	//"appengine"
+   "time"
 	//"fmt"
 	//"strconv"
 
@@ -27,9 +32,13 @@ const (
 	BIGQUERY_PROJECT       = "cometiphrd"
 	BIGQUERY_DATASET       = "appstore"
 	BIGQUERY_TABLE_DATA    = "data"
-	BIGQUERY_TABLE_PROCEED = "apps_proceed"
+	BIGQUERY_TABLE_PROCEED_PROD = "apps_proceed"
+	BIGQUERY_TABLE_PROCEED_DEV  = "apps_proceed_dev"
+
    BIGQUERY_QUERY_LIMIT   = 5
+   BIGQUERY_TIMEOUT      = 10*60*1000
 )
+
 
 // Wraps the BigQuery service and dataset and provides some helper functions.
 type bqDataset struct {
@@ -153,8 +162,17 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
                     Campaign
             HAVING LangsCount > 0
                   AND Campaign IS NULL
+                  AND SellerUrl != ""
             ORDER BY LangsCount ASC
             LIMIT {{.LIMIT}}`
+
+func getTableProceed() (string) {
+   if newappengine.IsDevAppServer() {
+      return BIGQUERY_TABLE_PROCEED_DEV
+   } else {
+      return BIGQUERY_TABLE_PROCEED_PROD
+   }
+}
 
 func (ds *bqDataset) Search(params *CampaignParams) (*[]AppBuffer, error) {
 
@@ -162,13 +180,13 @@ func (ds *bqDataset) Search(params *CampaignParams) (*[]AppBuffer, error) {
         "LIMIT":         BIGQUERY_QUERY_LIMIT,
         "DATASET":       BIGQUERY_DATASET,
         "TABLE_DATA":    BIGQUERY_TABLE_DATA,
-        "TABLE_PROCEED": BIGQUERY_TABLE_PROCEED,
+        "TABLE_PROCEED": getTableProceed(),
     }
 
     t := template.Must(template.New("email").Parse(queryNewAppsTmpl))
     buf := &bytes.Buffer{}
     if err := t.Execute(buf, data); err != nil {
-        panic(err)
+        return nil, err
     }
 
 	queryRequest := &bigquery.QueryRequest{
@@ -177,7 +195,7 @@ func (ds *bqDataset) Search(params *CampaignParams) (*[]AppBuffer, error) {
 		MaxResults: BIGQUERY_QUERY_LIMIT, //int64(max),
 		Kind:       "json",
 		//Kind: "igquery#queryRequest",
-		TimeoutMs: 60000, //defaultTimeOutMs,
+		TimeoutMs: BIGQUERY_TIMEOUT,
 	}
 
 	jobsService := bigquery.NewJobsService(ds.bq)
@@ -252,7 +270,12 @@ func connectBigQueryDB(r *http.Request, table string) (*bqDataset, error) {
 	if err != nil {
 		return nil, err
 	}
-	client := oauth2.NewClient(ctx, ts)
+
+   // urlfetch
+   ctx_with_deadline, _ := context.WithTimeout(ctx, 10*time.Minute)
+
+   client := oauth2.NewClient(ctx_with_deadline, ts)
+	//client := oauth2.NewClient(ctx, ts)
 
 	return newBQDataset(client, BIGQUERY_PROJECT, BIGQUERY_DATASET, table)
 }

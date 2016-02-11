@@ -11,9 +11,8 @@ import (
 )
 
 const (
-    DATASTORE_APP = "APP"
     DATASTORE_STORE = "APPSTORE"
-	 DATASTORE_CAMPAIGN    = "CAMPAIGN"
+	 DATASTORE_CAMPAIGN    = "Campaign"
 	 CAMPAIGN_LOCALIZATION = "CAMPAIGN_LOCALIZATION"
 )
 
@@ -85,18 +84,26 @@ func (campaign *Campaign) createCampaignParams() *CampaignParams {
 }
 
 func (campaign *Campaign) searchNewApps(r *http.Request) (error) {
+   с := appengine.NewContext(r)
+
+   с.Debugf("Connect to BQ")
+
 	db, err := connectBigQueryDB(r, BIGQUERY_TABLE_DATA)
 	if err != nil {
 		return err
 	}
+   с.Debugf("Connected to BQ successfully ")
 
 	params := campaign.createCampaignParams()
+
+   с.Debugf("createCampaignParams: ", params)
+
 	appsBuffer, err := db.Search(params)
 	if err != nil {
 		return err
 	}
 
-    с := appengine.NewContext(r)
+   с.Debugf("found Apps: ", len(*appsBuffer))
 
     apps := make([]App, len(*appsBuffer))
     for i, appBuffer := range *appsBuffer {
@@ -157,7 +164,7 @@ func (campaign *Campaign) saveApps(r *http.Request) (error) {
 
 
 func (campaign *Campaign) saveProceed(r *http.Request) (error) {
-    db, err := connectBigQueryDB(r, BIGQUERY_TABLE_PROCEED)
+    db, err := connectBigQueryDB(r, getTableProceed())
     if err != nil {
         return err
     }
