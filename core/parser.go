@@ -2,18 +2,19 @@ package core
 
 import (
 	"net/http"
+   "io/ioutil"
    "fmt"
+   "strings"
 
    "appengine"
    "appengine/datastore"
 
+   "golang.org/x/net/html"
    "golang.org/x/net/context"
 	newappengine "google.golang.org/appengine"
    "golang.org/x/oauth2"
-
-   //"appengine/urlfetch"
-
    "time"
+   "net/url"
 )
 
 const (
@@ -56,29 +57,137 @@ func parseApp(r *http.Request, appKey *datastore.Key) (error) {
 
     var ctx context.Context = newappengine.NewContext(r)
 
-    emails, err := parseUrl(ctx, app.SellerUrl)
+    base, err := url.Parse(app.SellerUrl)
     if err != nil {
-		return err
-	 }
-    c.Debugf("Emails parsed: ", emails)
+        return err
+    }
+
+    foundLinks, err := parseUrl(ctx, base)
+    if err != nil {
+        return err
+    }
+    c.Debugf("Links all: ", foundLinks)
+
+
+    parsedLinks, err := filterUrls(c, base, foundLinks)
+    if err != nil {
+        return err
+    }
+    c.Debugf("Links parsed: ", parsedLinks)
+
+
     return nil
 }
 
-func parseUrl(ctx context.Context, url string) ([]string, error) {
-
-    //c.Debugf("parseUrl: ", url)
-
-    if url == "" {
-       return nil, fmt.Errorf("No SellerUrl found")
-    }
-
-    ctx_with_deadline, _ := context.WithTimeout(ctx, 2*time.Minute)
-    client := oauth2.NewClient(ctx_with_deadline, nil)
-    resp, err := client.Get(url)
+func parseUrl(ctx context.Context, base *url.URL) ([]*url.URL, error) {
+    body, err := fetchUrl(ctx, base)
     if err != nil {
         return nil, err
     }
 
-    result := []string{resp.Status}
-    return result, nil
+    links := []*url.URL{}
+
+    doc, err := html.Parse(strings.NewReader(body))
+    if err != nil {
+        return nil, err
+    }
+    var f func(*html.Node)
+    f = func(n *html.Node) {
+        if n.Type == html.ElementNode && n.Data == "a" {
+            for _, a := range n.Attr {
+                if a.Key == "href" {
+                    //fmt.Println(a.Val)
+                    link, err := resolveUrl(base, a.Val)
+                    if err == nil {
+                        links = append(links, link)
+                    }
+                    break
+                }
+            }
+        }
+        for c := n.FirstChild; c != nil; c = c.NextSibling {
+            f(c)
+        }
+    }
+    f(doc)
+
+    return links, nil
+}
+
+
+func resolveUrl(base *url.URL, href string) (*url.URL, error) {
+    u, err := url.Parse(href)
+	 if err != nil {
+		 return nil, err
+	 }
+
+    return base.ResolveReference(u), nil
+}
+
+func inSlice(link *url.URL, links []*url.URL) bool {
+    for _, u := range links {
+        if link.String() == u.String() {
+            return true
+        }
+    }
+    return false
+}
+
+func filterUrls(c appengine.Context, base *url.URL, links []*url.URL) ([]*url.URL, error) {
+    newLinks := []*url.URL{}
+
+    for _, link := range links {
+	     link.Fragment = ""
+        /*c.Debugf("link:", link)
+        c.Debugf("Host:", link.Host)
+        c.Debugf("Empty domain?:", link.Host == "")
+        c.Debugf("Same domain?:", link.Host == base.Host)*/
+        err := validateDomain(base, link)
+        if err != nil {
+            continue
+        }
+        if inSlice(link, newLinks) {
+            continue
+        }
+        newLinks = append(newLinks, link)
+    }
+
+    return newLinks, nil
+}
+
+func validateDomain(base *url.URL, link *url.URL) (error) {
+    if !link.IsAbs() {
+        return fmt.Errorf("Validated domain error: url is not absolute: %s", link)
+    }
+
+    if (base.Host == "") {
+        return fmt.Errorf("Validated domain error: empty domain: %s", link)
+    }
+
+    if (base.Host != link.Host) {
+        return fmt.Errorf("Validated domain error: different domain: %s", link)
+    }
+
+    return nil
+}
+
+func fetchUrl(ctx context.Context, link *url.URL) (string, error) {
+    /*
+    if url == "" {
+       return "", fmt.Errorf("No SellerUrl found")
+    }*/
+
+    ctx_with_deadline, _ := context.WithTimeout(ctx, 2*time.Minute)
+    client := oauth2.NewClient(ctx_with_deadline, nil)
+    response, err := client.Get(link.String())
+    if err != nil {
+        return "", err
+    }
+
+    defer response.Body.Close()
+    contents, err := ioutil.ReadAll(response.Body)
+    if err != nil {
+        return "", err
+    }
+    return string(contents), nil
 }
