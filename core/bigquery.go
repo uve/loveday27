@@ -35,7 +35,6 @@ const (
 	BIGQUERY_TABLE_PROCEED_PROD = "apps_proceed"
 	BIGQUERY_TABLE_PROCEED_DEV  = "apps_proceed_dev"
 
-   BIGQUERY_QUERY_LIMIT   = 5
    BIGQUERY_TIMEOUT      = 10*60*1000
 )
 
@@ -163,7 +162,8 @@ func newBQDataset(client *http.Client, projectId string, datasetId string, table
             HAVING LangsCount > 0
                   AND Campaign IS NULL
                   AND SellerUrl != ""
-            ORDER BY LangsCount ASC
+            ORDER BY LangsCount ASC,
+                  ReleaseDate DESC
             LIMIT {{.LIMIT}}`
 
 func getTableProceed() (string) {
@@ -177,7 +177,7 @@ func getTableProceed() (string) {
 func (ds *bqDataset) Search(params *CampaignParams) (*[]AppBuffer, error) {
 
     data := map[string]interface{}{
-        "LIMIT":         BIGQUERY_QUERY_LIMIT,
+        "LIMIT":         SEARCH_APPS_LIMIT,
         "DATASET":       BIGQUERY_DATASET,
         "TABLE_DATA":    BIGQUERY_TABLE_DATA,
         "TABLE_PROCEED": getTableProceed(),
@@ -192,7 +192,7 @@ func (ds *bqDataset) Search(params *CampaignParams) (*[]AppBuffer, error) {
 	queryRequest := &bigquery.QueryRequest{
 		//DefaultDataset: datasetRef,
 		Query:      buf.String(),
-		MaxResults: BIGQUERY_QUERY_LIMIT, //int64(max),
+		MaxResults: SEARCH_APPS_LIMIT, //int64(max),
 		Kind:       "json",
 		//Kind: "igquery#queryRequest",
 		TimeoutMs: BIGQUERY_TIMEOUT,

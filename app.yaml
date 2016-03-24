@@ -23,6 +23,12 @@ handlers:
   upload:  static/favicon.ico
   secure: always
 
+
+- url: /robots.txt
+  static_files: static/robots.txt
+  upload:  static/robots.txt
+  secure: always
+
 - url: /templates
   static_dir: templates
   application_readable: true

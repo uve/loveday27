@@ -11,13 +11,6 @@ import (
 	"net/http"
 )
 
-
-const (
-   mailSenderName = "Anna Berry"
-   mailSenderAddress = "anna@localization.expert"
-   mailDomain = "localization.expert"
-)
-
 // Score is an entity to store campaign
 type Email struct {
 	Name    string
@@ -48,15 +41,15 @@ func handleSendPage(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	//addr := r.FormValue("email")
 	//url := createConfirmationURL(r)
-   c.Infof("Sender:", fmt.Sprintf(templateMailFrom, mailSenderName, mailSenderAddress))
+   c.Infof("Sender:", fmt.Sprintf(templateMailFrom, MAIL_SENDER_NAME, MAIL_SENDER_EMAIL))
 
 	addrs := []string{"check-auth@verifier.port25.com", "nikita.grachev@gmail.com", "daria.esaulova@gmail.com"}
 
 	msg := &mail.Message{
-		Sender:  fmt.Sprintf(templateMailFrom, mailSenderName, mailSenderAddress),
+		Sender:  fmt.Sprintf(templateMailFrom, MAIL_SENDER_NAME, MAIL_SENDER_EMAIL),
 		To:      addrs,
 		Subject: "Confirm your registration",
-		Body:    fmt.Sprintf(confirmMessage, mailDomain),
+		Body:    fmt.Sprintf(confirmMessage, MAIL_DOMAIN),
 	}
 	if err := mail.Send(c, msg); err != nil {
 		c.Errorf("Couldn't send email: %v", err)

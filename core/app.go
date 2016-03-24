@@ -84,7 +84,7 @@ func (appBuffer *AppBuffer) toApp() (App) {
 
 
 type AppBuffer struct {
-    Advisories                         string
+	Advisories                         string
 	ArtistId                           int
 	ArtistName                         string
 	ArtistViewUrl                      string
@@ -178,6 +178,7 @@ type App struct {
 
 	Created                          time.Time
 	//Campaign           string
+   Emails                          []string
 }
 
 func (app *App) getJson() (map[string]bigquery.JsonValue, error) {
@@ -200,4 +201,12 @@ func getApp(c appengine.Context, appKey *datastore.Key)	(*App, error) {
 		return nil, err
 	}
 	return &app, nil
+}
+
+
+func (app *App) Save(c appengine.Context, appKey *datastore.Key) (error) {
+   if _, err := datastore.Put(c, appKey, app); err != nil {
+		return err
+	}
+	return nil
 }
