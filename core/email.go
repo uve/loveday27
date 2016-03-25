@@ -25,7 +25,7 @@ type Email struct {
 
 const confirmMessage = `
 Hi,
- This is Anna Berry, I'm localization manager
+ This is Name, I'm localization manager
 It's my first message!!!
 Thank you for creating an account!
 
@@ -33,27 +33,37 @@ Thank you for creating an account!
 
 
 Best Regards,
-Anna Berry
+Name
 `
 const templateMailFrom = "%s <%s>"
 
 func handleSendPage(w http.ResponseWriter, r *http.Request) {
-	c := appengine.NewContext(r)
-	//addr := r.FormValue("email")
-	//url := createConfirmationURL(r)
-   c.Infof("Sender:", fmt.Sprintf(templateMailFrom, MAIL_SENDER_NAME, MAIL_SENDER_EMAIL))
+    c := appengine.NewContext(r)
+    //addr := r.FormValue("email")
+    //url := createConfirmationURL(r)
+    params, err := parseTemplateParams()
+    if err != nil {
+        c.Errorf("template execution: %s", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
 
-	addrs := []string{"check-auth@verifier.port25.com", "nikita.grachev@gmail.com", "daria.esaulova@gmail.com"}
+    c.Infof("Sender:", fmt.Sprintf(templateMailFrom, params.MailSenderName, params.MailSenderEmail))
 
-	msg := &mail.Message{
-		Sender:  fmt.Sprintf(templateMailFrom, MAIL_SENDER_NAME, MAIL_SENDER_EMAIL),
-		To:      addrs,
-		Subject: "Confirm your registration",
-		Body:    fmt.Sprintf(confirmMessage, MAIL_DOMAIN),
-	}
-	if err := mail.Send(c, msg); err != nil {
-		c.Errorf("Couldn't send email: %v", err)
-	}
+    addrs := []string{"nikita.grachev@gmail.com"}
+
+    msg := &mail.Message{
+        Sender:  fmt.Sprintf(templateMailFrom, params.MailSenderName, params.MailSenderEmail),
+        To:      addrs,
+        Subject: "Confirm your registration",
+        Body:    fmt.Sprintf(confirmMessage, "Test text"),
+    }
+
+    if err := mail.Send(c, msg); err != nil {
+        c.Errorf("template execution: %s", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
 }
 
 /*

@@ -1,9 +1,11 @@
 package core
 
 const (
-   MAIL_SENDER_NAME = "Anna Berry"
-   MAIL_SENDER_EMAIL = "anna@localization.expert"
-   MAIL_DOMAIN = "localization.expert"
+   MAIL_SENDER_NAME = "QW5uYSBCZXJyeQ=="
+   MAIL_SENDER_EMAIL = "YW5uYUBsb2NhbGl6YXRpb24uZXhwZXJ0"
+   MAIL_DOMAIN = "bG9jYWxpemF0aW9uLmV4cGVydA=="
+
+   GOOGLE_CLIENT_ID = "ODgyOTc1ODIwOTMyLXEzNGkybTFsa2xjbXY4a3FxcmNsZXVtdGRoZTRxYmhrLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t"
 
    SEARCH_APPS_LIMIT = 1
    PARSER_APPS_LIMIT = 1

@@ -9,25 +9,25 @@ import (
 )
 
 func handleMapPage(w http.ResponseWriter, r *http.Request) {
-	c := appengine.NewContext(r)
-	c.Debugf("map Page")
+    c := appengine.NewContext(r)
+    c.Debugf("map Page")
 
-	/*
-	   campaign, nil := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
-	   campaign.getAppByStatus(APP_STATUS_)
-	*/
-	params := Params{
-		//ClientId: config.Config.OAuthProviders.Google.ClientId,
-		ClientId: "882975820932-q34i2m1lklcmv8kqqrcleumtdhe4qbhk.apps.googleusercontent.com",
-	}
+    /*
+       campaign, nil := getCampaignByType(c, CAMPAIGN_LOCALIZATION)
+       campaign.getAppByStatus(APP_STATUS_)
+    */
+    params, err := parseTemplateParams()
+    if err != nil {
+        log.Fatalf("template execution: %s", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+    var index = template.Must(template.ParseFiles("templates/map.html"))
 
-	var index = template.Must(template.ParseFiles("templates/map.html"))
-
-	err := index.Execute(w, params)
-	if err != nil {
-		log.Fatalf("template execution: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+    err = index.Execute(w, params)
+    if err != nil {
+        log.Fatalf("template execution: %s", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 }
 
 /*

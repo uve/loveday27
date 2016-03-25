@@ -1,8 +1,8 @@
 cron:
-- description: Search new app from BigQuery
-  url: /search
-  schedule: every 60 minutes
+#- description: Search new app from BigQuery
+#  url: /search
+#  schedule: every 60 minutes
 
-- description: Parse apps e-mails
-  url: /parser
-  schedule: every 60 minutes
+#- description: Parse apps e-mails
+#  url: /parser
+#  schedule: every 60 minutes
