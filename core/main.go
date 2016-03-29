@@ -57,6 +57,7 @@ func handleMainPage(w http.ResponseWriter, r *http.Request) {
 
 func init() {
 	http.HandleFunc("/map", handleMapPage)
+   http.HandleFunc("/mail", handleMailPage)
 	http.HandleFunc("/send", handleSendPage)
 	http.HandleFunc("/setup", setup)
 	http.HandleFunc("/search", searchPage)

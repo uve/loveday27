@@ -59,7 +59,6 @@ func parserPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func parseApp(r *http.Request, appKey *datastore.Key) (error) {
@@ -238,6 +237,11 @@ func isEmailBlacklisted(str string) (error) {
     for _, blacklist := range BLACKLIST_EMAILS {
         if strings.Contains(str, blacklist) {
             return fmt.Errorf("Validated email error: blacklisted email: %s", str)
+        }
+    }
+    for _, blacklist := range BLACKLIST_EXTENSTIONS {
+        if strings.HasSuffix(str, blacklist) {
+            return fmt.Errorf("Validated domain error: blacklisted extension: %s", str)
         }
     }
     return nil

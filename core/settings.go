@@ -5,6 +5,8 @@ const (
    MAIL_SENDER_EMAIL = "YW5uYUBsb2NhbGl6YXRpb24uZXhwZXJ0"
    MAIL_DOMAIN = "bG9jYWxpemF0aW9uLmV4cGVydA=="
 
+   MAIL_BODY_GENERATING_LIMIT = 1
+
    GOOGLE_CLIENT_ID = "ODgyOTc1ODIwOTMyLXEzNGkybTFsa2xjbXY4a3FxcmNsZXVtdGRoZTRxYmhrLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t"
 
    SEARCH_APPS_LIMIT = 1
@@ -45,4 +47,5 @@ var BLACKLIST_EXTENSTIONS = []string{
     ".jpeg",
     ".css",
     ".js",
+    ".php",
 }

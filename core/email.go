@@ -2,13 +2,16 @@ package core
 
 import (
 
-   "appengine"
-	"appengine/mail"
-	"appengine/datastore"
-	"time"
+    "text/template"
+    "appengine"
+    "appengine/mail"
+    "appengine/datastore"
+    "time"
+    "bytes"
 
-	"fmt"
-	"net/http"
+    "io"
+    "fmt"
+    "net/http"
 )
 
 // Score is an entity to store campaign
@@ -20,6 +23,86 @@ type Email struct {
 	Campaign *datastore.Key
 	Created  time.Time
 	Modified time.Time
+}
+
+type MailParams struct {
+    Params *Params
+    App *App
+}
+
+func handleMailPage(w http.ResponseWriter, r *http.Request) {
+
+   c := appengine.NewContext(r)
+
+   tickets, ticket_keys, err := getTickets(c, STATUS_EMAIL_READY, ""/*STATUS_EMAIL_BODY_GENERATING*/, MAIL_BODY_GENERATING_LIMIT)
+   if err != nil {
+      http.Error(w, err.Error(), http.StatusInternalServerError)
+      return
+   }
+
+   c.Debugf("Tickets with Email Ready: ", ticket_keys)
+
+   if len(ticket_keys) < 1 {
+       return
+   }
+
+   processedTickets := []Ticket{}
+   processedTicketKeys := []*datastore.Key{}
+
+   for i, ticket := range tickets {
+      content, err := generateEmail(r, ticket.App)
+      if err != nil {
+          c.Errorf("Error: ", err.Error())
+          continue
+      }
+
+      ticket.Content = content.Bytes()
+
+      processedTickets = append(processedTickets, ticket)
+      processedTicketKeys = append(processedTicketKeys, ticket_keys[i])
+   }
+
+   //ToRemove
+   for _, ticket := range tickets {
+       io.WriteString(w, string(ticket.Content[:]))
+   }
+   err = setTicketsStatus(c, processedTickets, processedTicketKeys, STATUS_EMAIL_READY/*STATUS_EMAIL_BODY_READY*/)
+
+   if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+}
+
+
+func generateEmail(r *http.Request, appKey *datastore.Key) (*bytes.Buffer, error) {
+    c := appengine.NewContext(r)
+    app, err := getApp(c, appKey)
+    if err != nil {
+        return nil, err
+    }
+
+    c.Debugf("App Name: ", app.TrackName)
+
+
+    params, err := parseTemplateParams()
+    if err != nil {
+        return nil, err
+    }
+
+    mailParams := MailParams{
+      Params: params,
+      App: app,
+    }
+
+    var index = template.Must(template.ParseFiles("templates/mail.html"))
+    var doc bytes.Buffer
+    err = index.Execute(&doc, mailParams)
+    if err != nil {
+        return nil, err
+    }
+
+    return &doc, nil
 }
 
 

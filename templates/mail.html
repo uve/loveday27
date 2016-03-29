@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+<body>
+    <p><b>From:</b> {{.Params.MailSenderEmail}}</p>
+    <p><b>To:</b> {{.App.Emails}}</p>
+    <p><b>Subject:</b> Localization opportunities for {{.App.TrackName}}</p>
+
+    <div class="intro">Hello,</br>
+    My name is {{.Params.MailSenderName}}, I'm Head of Localization Services in mindale.com.</br>
+    I found your amazing app <b>{{.App.TrackName}}</b> in AppStore and want to show you some analytics report for your app.</div>
+
+            <div horizontal layout center class="app-logo">
+                <img src="{{.App.ArtworkUrl60}}"/>
+                <div><h2>{{.App.TrackName}}</h2></div>
+              </div>
+
+
+                <div class="info">Ваше приложение могут установить всего в <b>{app_cntrs}</b> из <b>{total_cntrs}</b> стран</div>
+              <google-chart id="geo" type='geo'>
+              </google-chart>
+
+
+
+            <div class="info">Ваше приложение переведено только на <b>{percent}%</b> языков на которых говорят пользователи</div>
+
+              <google-chart
+                id="pie"
+                type='pie'>
+              </google-chart>
+
+
+
+            <div class="info">Потенциальная аудитория вашего приложение всего <b>{app_users}</b> миллионов пользователей из <b>{total_users}</b> миллионов по всему миру</div>
+
+
+            <div id="regions_div" style="width: 900px; height: 500px;"></div>
+
+      </body>
+</html>

@@ -18,6 +18,8 @@ type Ticket struct {
 
     Created  time.Time
     Modified time.Time
+
+    Content  []byte
 }
 
 func getTickets(c appengine.Context, status string, newStatus string, limit int) ([]Ticket, []*datastore.Key, error) {
