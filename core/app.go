@@ -9,6 +9,12 @@ import (
    "appengine/datastore"
 
 	bigquery "google.golang.org/api/bigquery/v2"
+
+    "io/ioutil"
+    "net/http"
+    newappengine "google.golang.org/appengine"
+    "google.golang.org/appengine/urlfetch"
+    "encoding/base64"
 )
 
 const (
@@ -206,7 +212,26 @@ func getApp(c appengine.Context, appKey *datastore.Key)	(*App, error) {
 
 func (app *App) Save(c appengine.Context, appKey *datastore.Key) (error) {
    if _, err := datastore.Put(c, appKey, app); err != nil {
-		return err
-	}
-	return nil
+       return err
+   }
+   return nil
+}
+
+
+func (app *App) GetIcon(r *http.Request) (string, error) {
+    ctx := newappengine.NewContext(r)
+    client := urlfetch.Client(ctx)
+    resp, err := client.Get(app.ArtworkUrl60)
+    if err != nil {
+        return "", err
+    }
+
+    defer resp.Body.Close()
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        return "", err
+    }
+    result := base64.StdEncoding.EncodeToString(body)
+    result = "data:image/jpeg;base64," + result
+    return result, nil
 }

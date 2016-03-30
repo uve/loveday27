@@ -6,6 +6,8 @@ import (
     "appengine"
     "appengine/mail"
     "appengine/datastore"
+
+
     "time"
     "bytes"
 
@@ -28,6 +30,7 @@ type Email struct {
 type MailParams struct {
     Params *Params
     App *App
+    AppIcon string
 }
 
 func handleMailPage(w http.ResponseWriter, r *http.Request) {
@@ -75,6 +78,7 @@ func handleMailPage(w http.ResponseWriter, r *http.Request) {
 }
 
 
+
 func generateEmail(r *http.Request, appKey *datastore.Key) (*bytes.Buffer, error) {
     c := appengine.NewContext(r)
     app, err := getApp(c, appKey)
@@ -84,15 +88,21 @@ func generateEmail(r *http.Request, appKey *datastore.Key) (*bytes.Buffer, error
 
     c.Debugf("App Name: ", app.TrackName)
 
+    iconBody, err := app.GetIcon(r)
+    if err != nil {
+        return nil, err
+    }
 
     params, err := parseTemplateParams()
     if err != nil {
         return nil, err
     }
 
+
     mailParams := MailParams{
       Params: params,
       App: app,
+      AppIcon: iconBody,
     }
 
     var index = template.Must(template.ParseFiles("templates/mail.html"))
