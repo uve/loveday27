@@ -217,6 +217,8 @@ func (app *App) Save(c appengine.Context, appKey *datastore.Key) (error) {
    return nil
 }
 
+    AppIcon string
+
 
 func (app *App) GetIcon(r *http.Request) (string, error) {
     ctx := newappengine.NewContext(r)

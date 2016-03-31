@@ -31,6 +31,7 @@ type MailParams struct {
     Params *Params
     App *App
     AppIcon string
+    Calculations Calculations
 }
 
 func handleMailPage(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +79,6 @@ func handleMailPage(w http.ResponseWriter, r *http.Request) {
 }
 
 
-
 func generateEmail(r *http.Request, appKey *datastore.Key) (*bytes.Buffer, error) {
     c := appengine.NewContext(r)
     app, err := getApp(c, appKey)
@@ -98,11 +98,16 @@ func generateEmail(r *http.Request, appKey *datastore.Key) (*bytes.Buffer, error
         return nil, err
     }
 
+    calculations, err := app.GetCalculations()
+    if err != nil {
+        return nil, err
+    }
 
     mailParams := MailParams{
       Params: params,
       App: app,
       AppIcon: iconBody,
+      Calculations: *calculations,
     }
 
     var index = template.Must(template.ParseFiles("templates/mail.html"))
