@@ -24,85 +24,134 @@ type Country struct {
 
 type Lang struct {
     Name string
+    Code string
     CountryNames []string
 }
 
+
+type LangShare struct {
+    Total int
+    Used int
+    Percent float64
+    Langs []Lang
+}
 
 type Calculations struct {
     //LangsShare LangsShare
     CountryShare CountryShare
     Country Country
+
+    LangShare LangShare
 }
 
+func (app *App) getLangShare() LangShare {
+   var usedLangs = []Lang{}
+   for _, code := range app.LanguageCodesISO2A {
+       for _, lang := range ALL_LANGS {
+            if code == lang.Code {
+                usedLangs = append(usedLangs, lang)
+            }
+        }
+    }
+    total := len(ALL_LANGS)
+    used := len(usedLangs)
+    return LangShare{
+        Total: total,
+        Used: used,
+        Percent: float64(used) / float64(total) * float64(100),
+        Langs: usedLangs,
+    }
+}
 
 func (app *App) GetCalculations() (*Calculations, error) {
-    var calc = Calculations{Country: ALL_COUNTRIES[0]}
+    langShare := app.getLangShare()
+
+    var calc = Calculations{
+        Country: ALL_COUNTRIES[0],
+        LangShare: langShare,
+    }
     return &calc, nil
 }
 
 var ALL_LANGS = []Lang{
    Lang{
         Name: "Mandarin Chinese",
+        Code: "ZH",
         CountryNames: []string{"China", "Singapore"},
    },
    Lang{
         Name: "Hindi",
+        Code: "HI",
         CountryNames: []string{"India", "Fiji"},
    },
    Lang{
         Name: "Spanish",
+        Code: "ES",
         CountryNames: []string{"Argentina", "Bolivia", "Chile", "Colombia", "Costa Rica", "Cuba", "Dominican Republic", "Ecuador", "El Salvador", "Equatorial Guinea", "Guatemala", "Honduras", "Mexico", "Nicaragua", "Panama", "Paraguay", "Peru", "Spain", "United States", "New Mexico", "Puerto Rico", "Uruguay", "Venezuela"},
    },
    Lang{
         Name: "English",
+        Code: "EN",
         CountryNames: []string{"Antigua and Barbuda", "Australia", "The Bahamas", "Bangladesh", "Barbados", "Belize", "Botswana", "Brunei", "Cameroon", "Canada", "Dominica", "Ethiopia", "Eritrea", "Fiji", "The Gambia", "Ghana", "Grenada", "Guyana", "Hong Kong", "India", "Ireland", "Jamaica", "Kenya", "Kiribati", "Lesotho", "Liberia", "Malawi", "Maldives", "Malta", "Marshall Islands", "Maritius", "Micronesia", "Namibia", "Nauru", "New Zealand", "Nigeria", "Pakistan", "Palau", "Papua New Guinea", "Philippines", "Rwanda", "Saint Kitts and Nevs", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "Seychelles", "Sierra Leone", "Singapore", "Solomon Islands", "Somolia", "South Africa", "Sri Lanka", "Swaziland", "Tanzania", "Tonga", "Trinidad and Tobago", "Tuvalu", "Uganda", "United Kingdom", "United States", "Vanuatu", "Zambia", "Zimbabwe"},
    },
    Lang{
         Name: "Arabic",
+        Code: "AR",
         CountryNames: []string{"Algeria", "Bahrain", "Chad", "Comoros", "Djibouti", "Egypt", "Eritrea", "Iraq", "Israel", "Jordan", "Kuwait", "Lebanon", "Libya", "Morocco", "Niger", "Oman", "Palestinian Territories", "Quatar", "Saudi Arabia", "Somalia", "Sudan", "Syria", "Tunisia", "United Arab Emirates", "Western Sahara", "Yemen", "Mauritania", "Senegal"},
    },
    Lang{
         Name: "Portuguese",
+        Code: "PT",
         CountryNames: []string{"Angola", "Brazil", "Cape Verde", "East Timor", "Guinea-Bissau", "Macau", "Mozambique", "Portugal"},
    },
    Lang{
         Name: "Russian",
+        Code: "RU",
         CountryNames: []string{"Belarus", "Kazakhstan", "Kyyrgyzstan", "Russia"},
    },
    Lang{
         Name: "Japanese",
+        Code: "JP",
         CountryNames: []string{"Japan", "Palau"},
    },
    Lang{
         Name: "German",
+        Code: "DE",
         CountryNames: []string{"Austria", "Belgium", "Germany", "Italy", "Liechtenstein", "Luxembourg", "Poland", "Siwtzerland"},
    },
    Lang{
         Name: "Korean",
+        Code: "KO",
         CountryNames: []string{"North Korea", "South Korea"},
    },
    Lang{
         Name: "Vietnamese",
+        Code: "VN",
         CountryNames: []string{"Vietnam"},
    },
    Lang{
         Name: "French",
+        Code: "FR",
         CountryNames: []string{"Belgium", "Benin", "Burkina Faso", "Burundi", "Cameroon", "Canada", "Central African Republic", "Chad", "Comoros", "Congo-Brazzaville", "Congo-Kinshasa", "Côte d'Ivoire", "Djibouti", "Equatorial Guinea", "France", "French Polynesia", "Gabon", "Guernsey", "Guinea", "Haiti", "Italy", "Jersey", "Lebanon", "Luxembourg", "Madagascar", "Mali", "Martinique", "Mauritius", "Mayotte", "Monaco", "New Caledonia", "Niger", "Rwanda", "Senegal", "Seychelles", "Switzerland", "Togo", "Vanuatu"},
    },
    Lang{
         Name: "Italian",
+        Code: "IT",
         CountryNames: []string{"Croatia", "Italy", "San Marino", "Slovenia", "Switzerland"},
    },
    Lang{
         Name: "Turkish",
+        Code: "TR",
         CountryNames: []string{"Bulgaria", "Cyprus", "Turkey"},
    },
    Lang{
         Name: "Polish",
+        Code: "PL",
         CountryNames: []string{"Poland"},
    },
    Lang{
         Name: "Thai",
+        Code: "TH",
         CountryNames: []string{"Thailand"},
    },
 }

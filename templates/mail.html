@@ -11,6 +11,18 @@
     My name is {{.Params.MailSenderName}}, I'm Head of Localization Services in mindale.com.</br>
     I found your amazing app <b>{{.App.TrackName}}</b> in AppStore and want to show you some analytics report for your app.</div>
 
+    <p><h1>Langs Share</h1></p>
+    <p>total: {{.Calculations.LangShare.Total}}</p>
+    <p>used: {{.Calculations.LangShare.Used}}</p>
+    <p>percent: {{.Calculations.LangShare.Percent}}</p>
+    <p></p>
+
+    <p><h1>Country Share</h1></p>
+    <p></p>
+
+    <p><h1>Users Share</h1></p>
+    <p></p>
+
             <div horizontal layout center class="app-logo">
                 <img height="60" width="60" src="{{.AppIcon}}"/>
                 <div><h2>{{.App.TrackName}}</h2></div>
