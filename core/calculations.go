@@ -4,24 +4,6 @@ import (
 
 )
 
-/*
-type LangsShare struct {
-    Used
-    Total
-}
-*/
-
-type CountryShare struct {
-    Used int
-    Total int
-}
-
-type Country struct {
-    Code string
-    Name string
-    Population int
-}
-
 type Lang struct {
     Name string
     Code string
@@ -36,12 +18,31 @@ type LangShare struct {
     Langs []Lang
 }
 
-type Calculations struct {
-    //LangsShare LangsShare
-    CountryShare CountryShare
-    Country Country
+type Country struct {
+    Code string
+    Name string
+    Population int
+}
 
+
+type CountryShare struct {
+    Total int
+    Used int
+    Percent float64
+    Countries []Country
+}
+
+type PopulationShare struct {
+    Total int
+    Used int
+    Percent float64
+    Countries []Country
+}
+
+type Calculations struct {
     LangShare LangShare
+    CountryShare CountryShare
+    PopulationShare PopulationShare
 }
 
 func (app *App) getLangShare() LangShare {
@@ -63,15 +64,76 @@ func (app *App) getLangShare() LangShare {
     }
 }
 
+
+func isCountryinSlice(country Country, countries []Country) bool {
+    for _, u := range countries {
+        if country.Code == u.Code {
+            return true
+        }
+    }
+    return false
+}
+
+func getCountryShare(usedLangs []Lang) CountryShare {
+   var usedCountries = []Country{}
+   for _, lang := range usedLangs {
+       for _, countryName := range lang.CountryNames {
+            for _, country := range ALL_COUNTRIES {
+                if countryName == country.Name {
+                    if isCountryinSlice(country, usedCountries) {
+                        continue
+                    }
+                    usedCountries = append(usedCountries, country)
+                }
+            }
+        }
+    }
+    total := len(ALL_COUNTRIES)
+    used := len(usedCountries)
+    return CountryShare{
+        Total: total,
+        Used: used,
+        Percent: float64(used) / float64(total) * float64(100),
+        Countries: usedCountries,
+    }
+}
+
+func getPopulationShare(usedCountries []Country) PopulationShare {
+    used := 0
+    for _, country := range usedCountries {
+        used += country.Population
+    }
+    used = used / 1000000
+
+    total := 0
+    for _, country := range ALL_COUNTRIES {
+        total += country.Population
+    }
+
+    total = total / 1000000
+
+    return PopulationShare{
+        Total: total,
+        Used: used,
+        Percent: float64(used) / float64(total) * float64(100),
+        Countries: usedCountries,
+    }
+}
+
+
 func (app *App) GetCalculations() (*Calculations, error) {
     langShare := app.getLangShare()
+    countryShare := getCountryShare(langShare.Langs)
+    populationShare := getPopulationShare(countryShare.Countries)
 
     var calc = Calculations{
-        Country: ALL_COUNTRIES[0],
         LangShare: langShare,
+        CountryShare: countryShare,
+        PopulationShare: populationShare,
     }
     return &calc, nil
 }
+
 
 var ALL_LANGS = []Lang{
    Lang{

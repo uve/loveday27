@@ -12,16 +12,23 @@
     I found your amazing app <b>{{.App.TrackName}}</b> in AppStore and want to show you some analytics report for your app.</div>
 
     <p><h1>Langs Share</h1></p>
-    <p>total: {{.Calculations.LangShare.Total}}</p>
-    <p>used: {{.Calculations.LangShare.Used}}</p>
-    <p>percent: {{.Calculations.LangShare.Percent}}</p>
+        <p>total: {{.Calculations.LangShare.Total}}</p>
+        <p>used: {{.Calculations.LangShare.Used}}</p>
+        <p>percent: {{.Calculations.LangShare.Percent}}</p>
     <p></p>
 
     <p><h1>Country Share</h1></p>
+        <p>total: {{.Calculations.CountryShare.Total}}</p>
+        <p>used: {{.Calculations.CountryShare.Used}}</p>
+        <p>percent: {{.Calculations.CountryShare.Percent}}</p>
     <p></p>
 
-    <p><h1>Users Share</h1></p>
+    <p><h1>Population Share</h1></p>
+        <p>total: {{.Calculations.PopulationShare.Total}} millions</p>
+        <p>used: {{.Calculations.PopulationShare.Used}} millions</p>
+        <p>percent: {{.Calculations.PopulationShare.Percent}}%</p>
     <p></p>
+
 
             <div horizontal layout center class="app-logo">
                 <img height="60" width="60" src="{{.AppIcon}}"/>
