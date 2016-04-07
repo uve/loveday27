@@ -32,6 +32,7 @@ type MailParams struct {
     App *App
     AppIcon string
     Calculations Calculations
+    Charts *Charts
 }
 
 func handleMailPage(w http.ResponseWriter, r *http.Request) {
@@ -103,11 +104,17 @@ func generateEmail(r *http.Request, appKey *datastore.Key) (*bytes.Buffer, error
         return nil, err
     }
 
+    charts, err := calculations.GetCharts(r)
+    if err != nil {
+        return nil, err
+    }
+
     mailParams := MailParams{
       Params: params,
       App: app,
       AppIcon: iconBody,
       Calculations: *calculations,
+      Charts: charts,
     }
 
     var index = template.Must(template.ParseFiles("templates/mail.html"))
