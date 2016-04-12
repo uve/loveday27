@@ -15,7 +15,10 @@
         <p>total: {{.Calculations.LangShare.Total}}</p>
         <p>used: {{.Calculations.LangShare.Used}}</p>
         <p>percent: {{.Calculations.LangShare.Percent}}</p>
+
+        <p><img height="{{.Charts.LangsChart.Height}}" width="{{.Charts.LangsChart.Width}}" src="{{.Charts.LangsChart.Src}}"/></p>
     <p></p>
+
 
     <p><h1>Country Share</h1></p>
         <p>total: {{.Calculations.CountryShare.Total}}</p>
@@ -30,6 +33,8 @@
         <p>used: {{.Calculations.PopulationShare.Used}} millions</p>
         <p>percent: {{.Calculations.PopulationShare.Percent}}%</p>
     <p></p>
+
+
 
 
             <div horizontal layout center class="app-logo">
