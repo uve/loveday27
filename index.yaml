@@ -10,13 +10,3 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-- kind: Status
-  properties:
-  - name: Name
-  - name: Created
-    direction: desc
-
-- kind: Ticket
-  properties:
-  - name: Status
-  - name: Modified
