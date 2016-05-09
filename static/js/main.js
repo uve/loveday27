@@ -165,10 +165,36 @@ window.onload = function () {
 
   var i = setInterval(timer, 1000);
 
+
+/*
+  var all_images = document.querySelectorAll(".slide-show img");
+
+  var choosedClassName = "opaque";
+
+  function change_slide() {
+    for (var i = 0; i < all_images.length; i++) {
+      var slide = all_images[i];
+      if (slide.classList.contains(choosedClassName)) {
+
+        var next = i + 1;
+        if (next >= all_images.length) {
+          next = 0;
+        }
+
+        //slide.classList.remove(choosedClassName);
+        //all_images[next].classList.add(choosedClassName);
+        return;
+       }
+    }
+
+    all_images[0].classList.add(choosedClassName);
+  }
+
+  var j = setInterval(change_slide, 5000);
+
   //bar.animate(1.0);  // Number from 0.0 to 1.0
 
-
-
+*/
 /*
   var bar = new ProgressBar.Path('#date-days-path', {
     easing: 'easeInOut',
@@ -243,7 +269,14 @@ window.onload = function () {
   });
 
 
-  VK.Widgets.Comments("vk_comments", {limit: 15, width: "400px", attach: "*"});
+  var width = document.getElementById('section-comments').offsetWidth;
+  width *= 0.9;
+   if (width > 500) {
+     width = 500;
+   }
+
+
+  VK.Widgets.Comments("vk_comments", {limit: 15, width: width, attach: "*"});
 
   var feed = new Instafeed({
         /*clientId: '0775682bcdf64195b06e3c3eefa916dd',*/

@@ -38,6 +38,11 @@ handlers:
   static_dir: static
   secure: always
 
+- url: /loveday27.ru.html
+  static_files: static/loveday27.ru.html
+  upload:  static/loveday27.ru.html
+  secure: always
+
 - url: /.*
   script: _go_app
   secure: always

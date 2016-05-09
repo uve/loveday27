@@ -22,7 +22,7 @@ import (
 )
 
 const secretCookieName = "invitation_id"
-const secretCookieValue = "234erdklfgjflgj34lkj3"
+const secretCookieValue = 3453400000
 const htmlIndex = `<html><body>
 Login in with <a href="/auth">vk</a>
 </body></html>
@@ -64,11 +64,6 @@ var Guests = []Guest{
     Guest{
             Id: 112806371,
             Name: "Саша",
-            Description: "",
-        },
-    Guest{
-            Id: 3428873,
-            Name: "Артём",
             Description: "",
         },
     Guest{
@@ -142,6 +137,16 @@ var Guests = []Guest{
             Description: "",
         },
     Guest{
+            Id: 1410190,
+            Name: "Саша",
+            Description: "",
+        },
+    Guest{
+            Id: 585208,
+            Name: "Лиана",
+            Description: "",
+        },
+    Guest{
             Id: 5137830,
             Name: "Ярик",
             Description: "",
@@ -172,13 +177,8 @@ var Guests = []Guest{
             Description: "",
         },
     Guest{
-            Id: 1410190,
-            Name: "Саша",
-            Description: "",
-        },
-    Guest{
-            Id: 585208,
-            Name: "Лиана",
+            Id: 3428873,
+            Name: "Артём",
             Description: "",
         },
     }
@@ -192,6 +192,7 @@ var (
 
 type Params struct {
     Guests []Guest
+    GuestName string
 }
 
 func getConfig(r *http.Request) (*oauth2.Config) {
@@ -210,9 +211,11 @@ func getConfig(r *http.Request) (*oauth2.Config) {
 }
 
 
-func setCookie(w http.ResponseWriter) {
+func setCookie(w http.ResponseWriter, user_id int) {
+   value := strconv.Itoa(user_id)
+
    expiration := time.Now().Add(60 * 24 * time.Hour)
-   cookie :=  http.Cookie{Name: secretCookieName, Value:secretCookieValue, Expires:expiration}
+   cookie :=  http.Cookie{Name: secretCookieName, Value: value, Expires:expiration}
    http.SetCookie(w, &cookie)
 }
 
@@ -288,7 +291,7 @@ func isAuthorized(w http.ResponseWriter, r *http.Request) (error) {
     // Get the key from the URL
     specialKey := r.FormValue("sp")
     if specialKey == "0207" {
-       setCookie(w)
+       setCookie(w, secretCookieValue)
        return nil
     }
 
@@ -296,11 +299,13 @@ func isAuthorized(w http.ResponseWriter, r *http.Request) (error) {
     if err != nil {
         return err
     }
-    if secretCookieValue != cookie.Value {
-        return errors.New("invalid cookie")
+
+    user_id, err := strconv.Atoi(cookie.Value)
+    if err != nil {
+        return err
     }
 
-    return nil
+    return checkUserPermissions(user_id)
 }
 
 func checkUserPermissions(user_id int) (error) {
@@ -309,6 +314,11 @@ func checkUserPermissions(user_id int) (error) {
             return nil
         }
     }
+
+    if secretCookieValue == user_id {
+        return nil
+    }
+
     return errors.New("User is not in the list")
 }
 
@@ -400,7 +410,7 @@ func handleCallback(w http.ResponseWriter, r *http.Request) {
 
    c.Debugf("parseResponseBody: %s\n", string(response))
 
-   setCookie(w)
+   setCookie(w, user_id)
 
    http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
