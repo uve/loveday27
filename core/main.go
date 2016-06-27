@@ -31,6 +31,16 @@ Login in with <a href="/auth">vk</a>
 
 const htmlError = `<html><link rel="stylesheet" href="/static/css/main.css">
 <body class="error-image">
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-9798363-12', 'auto');
+    ga('send', 'pageview');
+
+  </script>
 </body></html>
 `
 
@@ -49,6 +59,29 @@ var Guests = []Guest{
             Name: "Никита",
             Description: "",
             IsAdmin: true,
+        },
+    Guest{
+            Id: 22298116,
+            Name: "Саша",
+            Description: "",
+            IsAdmin: true,
+        },
+    Guest{
+            Id: 193578951,
+            Name: "Юля",
+            Description: "",
+            IsAdmin: true,
+        },
+    Guest{
+            Id: 133500597,
+            Name: "Люба",
+            Description: "",
+            IsAdmin: true,
+        },
+    Guest{
+            Id: 1873981,
+            Name: "Юля",
+            Description: "",
         },
     Guest{
             Id: 2297896,
@@ -134,6 +167,21 @@ var Guests = []Guest{
     Guest{
             Id: 2444334,
             Name: "Алла",
+            Description: "",
+        },
+    Guest{
+            Id: 279409437,
+            Name: "Елена",
+            Description: "",
+        },
+    Guest{
+            Id: 9333181,
+            Name: "Наташа",
+            Description: "",
+        },
+    Guest{
+            Id: 61034886,
+            Name: "Таня",
             Description: "",
         },
     Guest{
